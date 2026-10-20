@@ -1,1 +1,105 @@
-"# Costruccion_Software" 
+# San Camilo en Línea — Laboratorio 04: Fundamentos de arquitectura de software
+Construcción de Software · EPIS-UNSA · 2026-B · Grupo 07
+
+---
+
+## Integrantes
+
+| Nombre | Rol en el laboratorio |
+|:---|:---|
+| **Estudiante 1** | Redactor de ADRs y modelador de arquitectura de dominio |
+| **Estudiante 2** | Diagramador de modelos (Mermaid, PlantUML y Python Diagrams) |
+| **Estudiante 3** | Verificador crítico de IA y analista de drivers / escenarios de calidad |
+
+---
+
+## Caso
+
+**San Camilo en Línea** es una plataforma web y móvil (PWA) orientada a digitalizar el comercio tradicional del emblemático Mercado San Camilo de Arequipa. El sistema permite a los clientes consultar catálogos independientes por puesto, agrupar productos de diversos puestos en un único carrito de compras, pagar mediante transferencia Yape y despachar órdenes con confirmación automática a cada comerciante por WhatsApp, bajo modalidades de recojo en tienda o delivery unificado.
+
+El **atributo de calidad crítico** es la **capacidad de interacción / usabilidad en celulares de gama baja**: un comerciante con escasa experiencia digital debe poder publicar productos o confirmar pedidos en **$\le 3$ toques** de pantalla desde un smartphone Android básico ($\le 2\text{ GB}$ de RAM) bajo las condiciones de conectividad 3G intermitente del mercado.
+
+---
+
+## Arquitectura elegida
+
+A continuación se presenta el diagrama de arquitectura del **Monolito Modular** estructurado en capas limpias y puertos y adaptadores:
+
+```mermaid
+flowchart TB
+    CLI["Cliente / Comprador"]
+    COM["Comerciante (Puesto Mercado)"]
+    REP["Repartidor (Delivery)"]
+    ADM["Administrador del Sistema"]
+
+    subgraph APP["San Camilo en Línea — Monolito Modular (Un solo despliegue)"]
+        direction TB
+        subgraph PRES["Capa de Presentación"]
+            PWA["PWA Móvil (HTML5 / Tailwind / JS)<br/>Optimizada para celulares de gama baja"]
+            API["API Gateway / Controladores REST (FastAPI)"]
+        end
+
+        subgraph CORE["Módulos de Dominio (Contextos Delimitados)"]
+            M1["Módulo Catálogo<br/>(Puestos y Productos)"]
+            M2["Módulo Pedidos<br/>(Carrito multi-puesto y órdenes)"]
+            M3["Módulo Pagos<br/>(Validación Yape / Plin)"]
+            M4["Módulo Notificaciones<br/>(Encolado de mensajes)"]
+            M5["Módulo Usuarios<br/>(Autenticación y perfiles)"]
+        end
+
+        subgraph INFRA["Capa de Infraestructura (Puertos y Adaptadores)"]
+            REPO["Repositorios SQLAlchemy y Migraciones Alembic"]
+            AD_YP["Adaptador Yape / Plin<br/>(Verificación código/comprobante)"]
+            AD_WA["Adaptador WhatsApp<br/>(URL wa.me y Webhooks)"]
+        end
+    end
+
+    DB[("PostgreSQL<br/>(Esquemas: catalogo, pedidos, pagos, notif, usuarios)")]
+    REDIS[("Redis<br/>(Caché catálogo y cola de tareas)")]
+    EXT_YP["Billeteras Digitales<br/>(Yape / Plin)"]
+    EXT_WA["Servicio WhatsApp<br/>(Confirmación al comerciante)"]
+
+    CLI & COM & REP & ADM --> PWA
+    PWA --> API
+    API --> M1 & M2 & M3 & M4 & M5
+    M1 & M2 & M3 & M4 & M5 --> INFRA
+    INFRA --> DB
+    INFRA --> REDIS
+    AD_YP -.-> EXT_YP
+    AD_WA -.-> EXT_WA
+
+    classDef mod fill:#E8F5E9,stroke:#2E7D32,stroke-width:1.5px,color:#000
+    classDef pres fill:#E3F2FD,stroke:#1565C0,stroke-width:1.5px,color:#000
+    classDef infra fill:#FFF8E1,stroke:#F57F17,stroke-width:1.5px,color:#000
+    classDef ext fill:#F5F5F5,stroke:#616161,stroke-width:1.5px,color:#000,stroke-dasharray: 4 3
+    classDef usr fill:#FCE4EC,stroke:#C2185B,stroke-width:1.5px,color:#000
+    classDef db fill:#EDE7F6,stroke:#512DA8,stroke-width:1.5px,color:#000
+
+    class M1,M2,M3,M4,M5 mod
+    class PWA,API pres
+    class REPO,AD_YP,AD_WA infra
+    class EXT_YP,EXT_WA ext
+    class CLI,COM,REP,ADM usr
+    class DB,REDIS db
+```
+
+---
+
+## Decisiones arquitectónicas
+
+- [ADR-001: Adoptar un monolito modular para el MVP de San Camilo en Línea](docs/architecture/adr/001-estilo-arquitectonico.md)
+- [ADR-002: Persistencia centralizada en PostgreSQL con esquemas aislados por módulo](docs/architecture/adr/002-estrategia-persistencia.md)
+- [ADR-003: Integración de pagos con Yape y notificaciones por WhatsApp mediante Puertos y Adaptadores](docs/architecture/adr/003-estrategia-notificaciones-y-pagos.md)
+
+---
+
+## Cuestionario Teórico
+
+Las respuestas completas a las 8 preguntas conceptuales de la Sección IV de la guía se encuentran documentadas en:
+- [Cuestionario de Fundamentos de Arquitectura de Software](docs/architecture/cuestionario.md)
+
+---
+
+## Reflexión sobre el uso de la IA (5 a 8 líneas)
+
+El asistente de IA demostró ser una herramienta de gran valor para acelerar la redacción formal de escenarios de calidad y estructurar la sintaxis de diagramas en Mermaid, PlantUML y Python Diagrams. Sin embargo, presentó sesgos notorios hacia la sobre-ingeniería inicial (sugiriendo microservicios con Kubernetes y brokers pesados) y alucinó capacidades inexistentes, como afirmar que Yape dispone de una API pública gratuita para pequeños comerciantes. La lección fundamental para el equipo fue que la IA propone con rapidez pero carece de criterio sobre las restricciones del mundo real; por tanto, el juicio crítico humano y la validación técnica contra costos reales, plazos estrictos y el contexto operativo del usuario final son insustituibles en la ingeniería de software.
