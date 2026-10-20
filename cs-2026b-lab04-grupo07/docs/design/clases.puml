@@ -1,0 +1,169 @@
+@startuml clases-pedidos
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam classBackgroundColor #EEF2F8
+skinparam classBorderColor #1A3A5C
+skinparam nodesep 25
+skinparam ranksep 35
+
+title San Camilo en Línea — Módulos Pedidos, Catálogo y Pagos (Diseño de Clases)
+
+class Cliente {
+    - id: UUID
+    - nombreCompleto: String
+    - telefono: String
+    - direccionEntrega: String
+    + getTelefono(): String
+}
+
+class Comerciante {
+    - id: UUID
+    - nombreCompleto: String
+    - telefonoWhatsApp: String
+    - dni: String
+    + recibirAviso(mensaje: String): void
+}
+
+class Puesto {
+    - id: UUID
+    - numeroPuesto: String
+    - seccionMercado: String
+    - nombreComercial: String
+    + getComerciante(): Comerciante
+}
+
+class Producto {
+    - id: UUID
+    - nombre: String
+    - precioUnitario: Decimal
+    - stockDisponible: int
+    - unidadMedida: String
+    + reservar(cantidad: int): void
+    + liberar(cantidad: int): void
+}
+
+class Pedido {
+    - id: UUID
+    - codigoSeguimiento: String
+    - fechaCreacion: DateTime
+    - totalConsolidado: Decimal
+    - estado: EstadoPedido
+    - modalidad: ModalidadEntrega
+    + agregarProducto(producto: Producto, cantidad: int, puesto: Puesto): void
+    + calcularTotal(): Decimal
+    + confirmar(): void
+    + dividirPorPuestos(): list[PedidoPuesto]
+    + registrarPago(pago: Pago): void
+    + cancelar(motivo: String): void
+    + verificarCompletado(): void
+}
+
+class PedidoPuesto {
+    - id: UUID
+    - subtotalPuesto: Decimal
+    - estadoPuesto: EstadoPedidoPuesto
+    + calcularSubtotal(): Decimal
+    + marcarListo(): void
+    + marcarRecogido(): void
+    + rechazar(motivo: String): void
+}
+
+class LineaPedido {
+    - id: UUID
+    - cantidad: int
+    - precioUnitario: Decimal
+    + subtotal(): Decimal
+}
+
+class Pago {
+    - id: UUID
+    - monto: Decimal
+    - medio: MedioPago
+    - codigoOperacion: String
+    - comprobanteUrl: String
+    - fechaPago: DateTime
+    - aprobado: bool
+    + esAprobado(): bool
+}
+
+enum EstadoPedido {
+    BORRADOR
+    CONFIRMADO
+    PAGO_PENDIENTE
+    PAGADO
+    EN_PREPARACION
+    ENTREGADO
+    CANCELADO
+}
+
+enum EstadoPedidoPuesto {
+    RECIBIDO
+    LISTO
+    RECOGIDO
+    ENTREGADO
+    RECHAZADO
+}
+
+enum MedioPago {
+    YAPE
+    PLIN
+}
+
+enum ModalidadEntrega {
+    RECOJO_EN_PUESTO
+    DELIVERY
+}
+
+interface PasarelaPago <<puerto>> {
+    + validarPago(monto: Decimal, codigoOperacion: String, comprobanteUrl: String): Pago
+}
+
+class YapeAdapter <<adaptador>> {
+    + validarPago(monto: Decimal, codigoOperacion: String, comprobanteUrl: String): Pago
+}
+
+class PlinAdapter <<adaptador>> {
+    + validarPago(monto: Decimal, codigoOperacion: String, comprobanteUrl: String): Pago
+}
+
+interface RepositorioPedidos <<puerto>> {
+    + buscarPorId(id: UUID): Pedido
+    + guardar(p: Pedido): void
+}
+
+interface NotificadorWhatsApp <<puerto>> {
+    + notificarPedidoComerciante(telefono: String, subpedido: PedidoPuesto): void
+}
+
+class ServicioPedidos <<servicio>> {
+    + confirmarYRegistrarPago(pedidoId: UUID, medio: MedioPago, codOp: String, comprobanteUrl: String): Pedido
+    + actualizarEstadoSubpedido(subpedidoId: UUID, nuevoEstado: EstadoPedidoPuesto): PedidoPuesto
+}
+
+' Relaciones y multiplicidades estrictas en ambos extremos
+Cliente "1" -- "0..*" Pedido : realiza >
+Comerciante "1" -- "1..*" Puesto : administra >
+Puesto "1" *-- "1..*" Producto : ofrece >
+Puesto "1" -- "0..*" PedidoPuesto : atiende >
+
+Pedido "1" *-- "1..*" PedidoPuesto : divide en >
+PedidoPuesto "1" *-- "1..*" LineaPedido : contiene >
+LineaPedido "0..*" --> "1" Producto : referencia >
+
+Pedido "1" -- "0..1" Pago : registra >
+
+Pedido --> EstadoPedido
+Pedido --> ModalidadEntrega
+PedidoPuesto --> EstadoPedidoPuesto
+Pago --> MedioPago
+
+PasarelaPago <|.. YapeAdapter
+PasarelaPago <|.. PlinAdapter
+
+ServicioPedidos ..> Pedido : orquesta
+ServicioPedidos ..> RepositorioPedidos : usa
+ServicioPedidos ..> PasarelaPago : usa
+ServicioPedidos ..> NotificadorWhatsApp : usa
+
+@enduml

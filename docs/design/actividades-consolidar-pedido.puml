@@ -1,0 +1,54 @@
+@startuml actividades-consolidar-pedido
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ActivityBackgroundColor #EEF2F8
+skinparam ActivityBorderColor #1A3A5C
+
+|Cliente|
+start
+:Arma el carrito con productos de múltiples puestos;
+:Confirma el pedido y selecciona modalidad de entrega;
+
+|Sistema|
+:Valida el stock de cada producto en sus puestos;
+if (¿Stock disponible en todos los puestos?) then (sí)
+    :Bloquea temporalmente el stock;
+    :Solicita y recibe comprobante de pago Yape;
+    :Verifica el código de operación y monto total;
+    if (¿Pago aprobado?) then (sí)
+        :Registra pedido consolidado como PAGADO;
+        :Divide la orden en subpedidos por puesto;
+        fork
+            :Despacha notificación con comanda\npor WhatsApp a cada comerciante;
+        fork again
+            :Envía confirmación con código\nde seguimiento al cliente;
+        end fork
+
+        |Comerciante|
+        :Recibe el mensaje en su WhatsApp;
+        :Prepara y empaqueta los productos del puesto;
+        :Marca subpedido como LISTO;
+
+        |Sistema|
+        :Consolida el estado de los puestos;
+
+        |Cliente|
+        :Recoge en los puestos del mercado\no recibe por delivery;
+        :Confirma la recepción final del pedido;
+        stop
+    else (no)
+        |Sistema|
+        :Libera el stock temporalmente reservado;
+        :Marca el pedido consolidado como CANCELADO;
+        |Cliente|
+        :Recibe notificación de pago rechazado;
+        stop
+    endif
+else (no)
+    |Cliente|
+    :Recibe alerta de productos no disponibles;
+    :Ajusta cantidades o cambia de puesto;
+    stop
+endif
+
+@enduml

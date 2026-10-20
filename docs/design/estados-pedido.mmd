@@ -1,0 +1,17 @@
+stateDiagram-v2
+    [*] --> BORRADOR : agregarProducto()
+    BORRADOR --> CONFIRMADO : confirmar() [stock suficiente en puestos]
+    CONFIRMADO --> PAGO_PENDIENTE : solicitarValidacionPago()
+    PAGO_PENDIENTE --> PAGADO : registrarPago() [pago Yape aprobado]
+    PAGO_PENDIENTE --> CANCELADO : cancelar() [pago rechazado o expirado > 15 min]
+    PAGADO --> EN_PREPARACION : dividirPorPuestos()
+    EN_PREPARACION --> ENTREGADO : verificarCompletado() [todos los puestos entregados]
+    BORRADOR --> CANCELADO : cancelar() [cliente descarta carrito]
+    CONFIRMADO --> CANCELADO : cancelar() [falta de stock o cancelacion]
+    ENTREGADO --> [*]
+    CANCELADO --> [*]
+
+    note right of PAGADO
+        Al entrar: notificar a comerciantes
+        por WhatsApp y reservar stock final
+    end note

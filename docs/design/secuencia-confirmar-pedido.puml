@@ -1,0 +1,89 @@
+@startuml secuencia-confirmar-pedido
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+autonumber
+
+actor "Cliente" as CLI
+participant "PWA Móvil" as UI
+participant "PedidoController" as C
+participant "ServicioPedidos" as S
+participant "RepositorioPedidos" as R
+participant "Pedido" as P
+participant "PasarelaPago\n(YapeAdapter)" as G
+participant "NotificadorWhatsApp" as N
+
+CLI -> UI : Confirmar pedido y adjuntar Yape
+activate UI
+UI -> C : POST /pedidos/{id}/confirmar-y-pagar
+activate C
+C -> S : confirmarYRegistrarPago(id, YAPE, codOp, comprobanteUrl)
+activate S
+
+S -> R : buscarPorId(id)
+activate R
+R --> S : pedido
+deactivate R
+
+S -> P : confirmar()
+activate P
+loop por cada línea de producto
+    P -> P : producto.reservar(cantidad)
+end
+deactivate P
+
+S -> P : calcularTotal()
+activate P
+P --> S : totalConsolidado
+deactivate P
+
+S -> G : validarPago(totalConsolidado, codOp, comprobanteUrl)
+activate G
+
+alt pago aprobado
+    G --> S : pago (aprobado = true)
+    S -> P : registrarPago(pago)
+    activate P
+    S -> P : dividirPorPuestos()
+    P --> S : listaSubpedidos
+    deactivate P
+    
+    S -> R : guardar(pedido)
+    activate R
+    R --> S : ok
+    deactivate R
+
+    loop por cada subpedido en listaSubpedidos
+        S ->> N : notificarPedidoComerciante(comercianteTel, subpedido)
+        note right of N : asíncrono\n(no bloquea la respuesta HTTP)
+    end
+
+    S --> C : pedido PAGADO
+    C --> UI : 200 OK (Pedido confirmado y dividido)
+    UI --> CLI : Muestra confirmación y estado de preparación
+
+else pago rechazado o inconsistente
+    G --> S : pago (aprobado = false)
+    deactivate G
+    S -> P : cancelar("Pago Yape rechazado o monto no coincide")
+    activate P
+    loop por cada línea de producto
+        P -> P : producto.liberar(cantidad)
+    end
+    deactivate P
+
+    S -> R : guardar(pedido)
+    activate R
+    R --> S : ok
+    deactivate R
+
+    S --> C : pedido CANCELADO
+    C --> UI : 402 Payment Required (Pago rechazado)
+    UI --> CLI : Muestra motivo de rechazo y opción de reintento
+end
+
+deactivate S
+deactivate C
+deactivate UI
+
+@enduml

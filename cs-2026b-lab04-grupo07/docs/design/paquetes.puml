@@ -1,0 +1,62 @@
+@startuml paquetes
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title San Camilo en Línea — Paquetes del Monolito Modular (Vista de Desarrollo)
+
+package "san_camilo" {
+    package "catalogo" as CAT {
+        class "Producto"
+        class "Puesto"
+    }
+
+    package "pedidos" as PED {
+        class "Pedido"
+        class "PedidoPuesto"
+        class "LineaPedido"
+        class "ServicioPedidos"
+    }
+
+    package "pagos" as PAG {
+        interface "PasarelaPago"
+        class "Pago"
+        class "YapeAdapter"
+        class "PlinAdapter"
+    }
+
+    package "notificaciones" as NOT {
+        interface "NotificadorWhatsApp"
+        class "WhatsAppAdapter"
+    }
+
+    package "usuarios" as USU {
+        class "Cliente"
+        class "Comerciante"
+    }
+
+    package "compartido" as COM {
+        class "IdentificadorUUID"
+        class "Dinero"
+    }
+}
+
+PED ..> CAT : usa Producto y Puesto
+PED ..> PAG : usa PasarelaPago\n(puerto)
+PED ..> NOT : usa NotificadorWhatsApp\n(puerto)
+PED ..> USU : asocia Cliente\ny Comerciante
+
+CAT ..> COM
+PED ..> COM
+PAG ..> COM
+NOT ..> COM
+USU ..> COM
+
+note bottom of PAG
+  Regla C4 (ADR-001): Arquitectura sin dependencias cíclicas.
+  pagos NO depende de pedidos.
+  notificaciones NO depende de pedidos.
+  El flujo de control se desacopla mediante puertos e interfaces.
+end note
+
+@enduml
