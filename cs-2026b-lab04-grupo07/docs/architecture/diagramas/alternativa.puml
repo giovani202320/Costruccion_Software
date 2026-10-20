@@ -1,0 +1,53 @@
+@startuml
+skinparam dpi 220
+skinparam componentStyle rectangle
+skinparam defaultFontName Arial
+skinparam backgroundColor white
+title Alternativa descartada: San Camilo en Línea con microservicios
+
+actor "Cliente / Comerciante / Repartidor" as U
+node "API Gateway" as GW
+
+package "Microservicios Independientes" {
+    [Servicio Catálogo] as C
+    [Servicio Pedidos Multi-Puesto] as P
+    [Servicio Pagos Yape/Plin] as PA
+    [Servicio Notificaciones] as N
+    [Servicio Usuarios] as US
+}
+
+queue "Broker de eventos\n(RabbitMQ / Kafka)" as MQ
+database "BD Catálogo" as DB1
+database "BD Pedidos" as DB2
+database "BD Pagos" as DB3
+database "BD Usuarios" as DB4
+
+cloud "Billeteras (Yape / Plin)" as Y
+cloud "WhatsApp API" as W
+
+U --> GW
+GW --> C
+GW --> P
+GW --> PA
+GW --> N
+GW --> US
+
+C --> DB1
+P --> DB2
+PA --> DB3
+US --> DB4
+
+P ..> MQ : Evento PedidoMultiPuestoCreado
+MQ ..> PA : Iniciar verificación de pago
+MQ ..> N : Generar mensajes a comerciantes
+PA --> Y
+N --> W
+
+note bottom of MQ
+  Descartada en la matriz de decisión (puntaje: 2.35 / 5.00).
+  La subdivisión de pedidos entre múltiples puestos con un pago único Yape
+  exige implementar transacciones distribuidas complejas (patrón Saga) y un broker.
+  Gestionar más de 5 despliegues, bases de datos aisladas y monitoreo distribuido
+  es inviable para un equipo de 3 estudiantes en 1 mes con presupuesto cero.
+end note
+@enduml
