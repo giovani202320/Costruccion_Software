@@ -1,0 +1,125 @@
+@startuml classes_pedidos
+set namespaceSeparator none
+class "Cliente" as pedidos.dominio.Cliente {
+  direccion_entrega : str
+  id : UUID
+  nombre_completo : str
+  telefono : str
+  get_telefono() -> str
+}
+class "Comerciante" as pedidos.dominio.Comerciante {
+  dni : str
+  id : UUID
+  nombre_completo : str
+  telefono_whatsapp : str
+  {abstract}recibir_aviso(mensaje: str) -> None
+}
+class "EstadoPedido" as pedidos.dominio.EstadoPedido {
+  name
+}
+class "EstadoPedidoPuesto" as pedidos.dominio.EstadoPedidoPuesto {
+  name
+}
+class "LineaPedido" as pedidos.dominio.LineaPedido {
+  cantidad : int
+  id : UUID
+  precio_unitario : Decimal
+  producto : Optional[Producto]
+  subtotal() -> Decimal
+}
+class "MedioPago" as pedidos.dominio.MedioPago {
+  name
+}
+class "ModalidadEntrega" as pedidos.dominio.ModalidadEntrega {
+  name
+}
+class "NotificadorWhatsApp" as pedidos.dominio.NotificadorWhatsApp {
+  {abstract}notificar_pedido_comerciante(telefono: str, subpedido: PedidoPuesto) -> None
+}
+class "Pago" as pedidos.dominio.Pago {
+  aprobado : bool
+  codigo_operacion : str
+  comprobante_url : str
+  fecha_pago : datetime
+  id : UUID
+  medio
+  monto : Decimal
+  es_aprobado() -> bool
+}
+class "PasarelaPago" as pedidos.dominio.PasarelaPago {
+  {abstract}validar_pago(monto: Decimal, codigo_operacion: str, comprobante_url: str) -> Pago
+}
+class "Pedido" as pedidos.dominio.Pedido {
+  cliente : Optional[Cliente]
+  codigo_seguimiento : str
+  estado
+  fecha_creacion : datetime
+  id : UUID
+  modalidad
+  pago : Optional[Pago]
+  subpedidos : List[PedidoPuesto]
+  total_consolidado : Decimal
+  agregar_producto(producto: Producto, cantidad: int, puesto: Puesto) -> None
+  calcular_total() -> Decimal
+  cancelar(motivo: str) -> None
+  confirmar() -> None
+  dividir_por_puestos() -> List[PedidoPuesto]
+  registrar_pago(pago: Pago) -> None
+  verificar_completado() -> None
+}
+class "PedidoPuesto" as pedidos.dominio.PedidoPuesto {
+  estado_puesto
+  id : UUID
+  lineas : List[LineaPedido]
+  puesto : Optional[Puesto]
+  subtotal_puesto : Decimal
+  calcular_subtotal() -> Decimal
+  marcar_listo() -> None
+  marcar_recogido() -> None
+  rechazar(motivo: str) -> None
+}
+class "PlinAdapter" as pedidos.dominio.PlinAdapter {
+  {abstract}validar_pago(monto: Decimal, codigo_operacion: str, comprobante_url: str) -> Pago
+}
+class "Producto" as pedidos.dominio.Producto {
+  id : UUID
+  nombre : str
+  precio_unitario : Decimal
+  puesto : Optional[Puesto]
+  stock_disponible : int
+  unidad_medida : str
+  liberar(cantidad: int) -> None
+  reservar(cantidad: int) -> None
+}
+class "Puesto" as pedidos.dominio.Puesto {
+  comerciante : Optional[Comerciante]
+  id : UUID
+  nombre_comercial : str
+  numero_puesto : str
+  seccion_mercado : str
+  get_comerciante() -> Optional[Comerciante]
+}
+class "RepositorioPedidos" as pedidos.dominio.RepositorioPedidos {
+  {abstract}buscar_por_id(id: UUID) -> Optional[Pedido]
+  {abstract}guardar(p: Pedido) -> None
+}
+class "ServicioPedidos" as pedidos.dominio.ServicioPedidos {
+  notificador
+  pasarela
+  repo
+  actualizar_estado_subpedido(pedido_id: UUID, subpedido_id: UUID, nuevo_estado: EstadoPedidoPuesto) -> PedidoPuesto
+  confirmar_y_registrar_pago(pedido_id: UUID, medio: MedioPago, codigo_operacion: str, comprobante_url: str) -> Pedido
+}
+class "YapeAdapter" as pedidos.dominio.YapeAdapter {
+  {abstract}validar_pago(monto: Decimal, codigo_operacion: str, comprobante_url: str) -> Pago
+}
+pedidos.dominio.PlinAdapter --|> pedidos.dominio.PasarelaPago
+pedidos.dominio.YapeAdapter --|> pedidos.dominio.PasarelaPago
+pedidos.dominio.Pedido --> pedidos.dominio.EstadoPedido : estado
+pedidos.dominio.PedidoPuesto --> pedidos.dominio.EstadoPedidoPuesto : estado_puesto
+pedidos.dominio.Pago --> pedidos.dominio.MedioPago : medio
+pedidos.dominio.Pedido --> pedidos.dominio.ModalidadEntrega : modalidad
+pedidos.dominio.NotificadorWhatsApp --o pedidos.dominio.ServicioPedidos : notificador
+pedidos.dominio.PasarelaPago --o pedidos.dominio.ServicioPedidos : pasarela
+pedidos.dominio.RepositorioPedidos --o pedidos.dominio.ServicioPedidos : repo
+@enduml

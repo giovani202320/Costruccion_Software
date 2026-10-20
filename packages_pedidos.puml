@@ -1,0 +1,7 @@
+@startuml packages_pedidos
+set namespaceSeparator none
+package "pedidos" as pedidos {
+}
+package "pedidos.dominio" as pedidos.dominio {
+}
+@enduml

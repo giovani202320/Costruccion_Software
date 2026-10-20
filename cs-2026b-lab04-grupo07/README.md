@@ -100,6 +100,49 @@ Las respuestas completas a las 8 preguntas conceptuales de la Sección IV de la 
 
 ---
 
+## Diseño UML (Lab 05)
+
+### 1. Historia de Usuario Crítica y Criterios
+- [HU-01: Pedido a múltiples puestos con pago unificado vía Yape](docs/design/historia.md)
+
+### 2. Máquina de Estados del Pedido (Mermaid)
+
+```mermaid
+stateDiagram-v2
+    [*] --> BORRADOR : agregarProducto()
+    BORRADOR --> CONFIRMADO : confirmar() [stock suficiente en puestos]
+    CONFIRMADO --> PAGO_PENDIENTE : solicitarValidacionPago()
+    PAGO_PENDIENTE --> PAGADO : registrarPago() [pago Yape aprobado]
+    PAGO_PENDIENTE --> CANCELADO : cancelar() [pago rechazado o expirado > 15 min]
+    PAGADO --> EN_PREPARACION : dividirPorPuestos()
+    EN_PREPARACION --> ENTREGADO : verificarCompletado() [todos los puestos entregados]
+    BORRADOR --> CANCELADO : cancelar() [cliente descarta carrito]
+    CONFIRMADO --> CANCELADO : cancelar() [falta de stock o cancelacion]
+    ENTREGADO --> [*]
+    CANCELADO --> [*]
+
+    note right of PAGADO
+        Al entrar: notificar a comerciantes
+        por WhatsApp y reservar stock final
+    end note
+```
+
+### 3. Diagramas de Diseño y Enlaces
+- **Diagrama de Clases (E1):** [clases.puml](docs/design/clases.puml) · [Render PNG](docs/design/img/clases.png)
+- **Diagrama de Secuencia (E2):** [secuencia-confirmar-pedido.puml](docs/design/secuencia-confirmar-pedido.puml) · [Render PNG](docs/design/img/secuencia-confirmar-pedido.png)
+- **Diagrama de Máquina de Estados (E3):** [estados-pedido.mmd](docs/design/estados-pedido.mmd) · [Render PNG](docs/design/img/estados-pedido.png)
+- **Diagrama de Actividades (E4):** [actividades-consolidar-pedido.puml](docs/design/actividades-consolidar-pedido.puml) · [Render PNG](docs/design/img/actividades-consolidar-pedido.png)
+- **Diagrama de Paquetes (E5):** [paquetes.puml](docs/design/paquetes.puml) · [Render PNG](docs/design/img/paquetes.png)
+
+### 4. Ingeniería Directa e Inversa (Round-Trip) y Consistencia
+- **Código de Dominio (Python 3.10):** [src/pedidos/dominio.py](src/pedidos/dominio.py)
+- **Diagrama Inverso (pyreverse):** [classes_pedidos.puml](docs/design/classes_pedidos.puml) · [Render PNG](docs/design/img/classes_pedidos.png)
+- **Análisis Round-Trip (E6):** [round-trip.md](docs/design/round-trip.md)
+- **Auditoría de Consistencia C1-C5 (E7):** [consistencia.md](docs/design/consistencia.md)
+- **Bitácora de Uso de IA (E7):** [bitacora-ia.md](docs/design/bitacora-ia.md)
+
+---
+
 ## Reflexión sobre el uso de la IA (5 a 8 líneas)
 
 El asistente de IA demostró ser una herramienta de gran valor para acelerar la redacción formal de escenarios de calidad y estructurar la sintaxis de diagramas en Mermaid, PlantUML y Python Diagrams. Sin embargo, presentó sesgos notorios hacia la sobre-ingeniería inicial (sugiriendo microservicios con Kubernetes y brokers pesados) y alucinó capacidades inexistentes, como afirmar que Yape dispone de una API pública gratuita para pequeños comerciantes. La lección fundamental para el equipo fue que la IA propone con rapidez pero carece de criterio sobre las restricciones del mundo real; por tanto, el juicio crítico humano y la validación técnica contra costos reales, plazos estrictos y el contexto operativo del usuario final son insustituibles en la ingeniería de software.
