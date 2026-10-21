@@ -1,0 +1,43 @@
+graph LR
+  linkStyle default fill:#ffffff
+
+  subgraph diagram ["Component View: San Camilo en Línea - API San Camilo"]
+    style diagram fill:#ffffff,stroke:#ffffff
+
+    subgraph 7 ["San Camilo en Línea"]
+      style 7 fill:#ffffff,stroke:#0b4884,color:#0b4884
+
+      subgraph 9 ["API San Camilo"]
+        style 9 fill:#ffffff,stroke:#2e6295,color:#2e6295
+
+        10["<div style='font-weight: bold'>Módulo Catálogo</div><div style='font-size: 70%; margin-top: 0px'>[Component: Módulo Python]</div><div style='font-size: 80%; margin-top:10px'>Administra puestos,<br />productos, precios,<br />disponibilidad y reserva de<br />stock mediante su interfaz<br />pública.</div>"]
+        style 10 fill:#85bbf0,stroke:#5d82a8,color:#000000
+        11["<div style='font-weight: bold'>Módulo Pedidos</div><div style='font-size: 70%; margin-top: 0px'>[Component: Módulo Python]</div><div style='font-size: 80%; margin-top:10px'>Orquesta el carrito<br />multi-puesto, el pedido<br />consolidado, las subórdenes y<br />su ciclo de vida.</div>"]
+        style 11 fill:#85bbf0,stroke:#5d82a8,color:#000000
+        12["<div style='font-weight: bold'>Módulo Pagos</div><div style='font-size: 70%; margin-top: 0px'>[Component: Módulo Python; puertos y adaptadores]</div><div style='font-size: 80%; margin-top:10px'>Registra comprobantes y<br />encapsula la validación<br />mediante un puerto de<br />pasarela de pago.</div>"]
+        style 12 fill:#85bbf0,stroke:#5d82a8,color:#000000
+        13["<div style='font-weight: bold'>Módulo Notificaciones</div><div style='font-size: 70%; margin-top: 0px'>[Component: Módulo Python; puertos y adaptadores]</div><div style='font-size: 80%; margin-top:10px'>Formatea avisos por puesto y<br />los encola para despacho<br />asíncrono.</div>"]
+        style 13 fill:#85bbf0,stroke:#5d82a8,color:#000000
+        14["<div style='font-weight: bold'>Módulo Usuarios</div><div style='font-size: 70%; margin-top: 0px'>[Component: Módulo Python]</div><div style='font-size: 80%; margin-top:10px'>Gestiona autenticación y<br />perfiles de clientes,<br />comerciantes, repartidores y<br />administradores.</div>"]
+        style 14 fill:#85bbf0,stroke:#5d82a8,color:#000000
+      end
+
+      16[("<div style='font-weight: bold'>PostgreSQL</div><div style='font-size: 70%; margin-top: 0px'>[Container: PostgreSQL 15+]</div><div style='font-size: 80%; margin-top:10px'>Persistencia ACID con<br />esquemas lógicos aislados:<br />catalogo, pedidos, pagos,<br />notificaciones y usuarios.</div>")]
+      style 16 fill:#438dd5,stroke:#2e6295,color:#ffffff
+      17["<div style='font-weight: bold'>Redis</div><div style='font-size: 70%; margin-top: 0px'>[Container: Redis]</div><div style='font-size: 80%; margin-top:10px'>Caché del catálogo y cola de<br />tareas de notificación.</div>"]
+      style 17 fill:#438dd5,stroke:#2e6295,color:#ffffff
+    end
+
+    10-. "<div>Lee y escribe su esquema<br />catalogo</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->16
+    11-. "<div>Lee y escribe su esquema<br />pedidos</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->16
+    12-. "<div>Lee y escribe su esquema<br />pagos</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->16
+    13-. "<div>Lee y escribe su esquema<br />notificaciones</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->16
+    14-. "<div>Lee y escribe su esquema<br />usuarios</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->16
+    10-. "<div>Lee y actualiza caché de<br />catálogo</div><div style='font-size: 70%'>[Redis protocol]</div>" .->17
+    13-. "<div>Encola avisos y reintentos</div><div style='font-size: 70%'>[Redis protocol]</div>" .->17
+    11-. "<div>Solicita reservar o liberar<br />stock</div><div style='font-size: 70%'>[Interfaz de servicio en memoria]</div>" .->10
+    11-. "<div>Solicita registrar y validar<br />el pago</div><div style='font-size: 70%'>[Interfaz de servicio en memoria]</div>" .->12
+    11-. "<div>Solicita avisar a<br />comerciantes</div><div style='font-size: 70%'>[Interfaz de servicio en memoria]</div>" .->13
+    11-. "<div>Consulta perfil y modalidad<br />de entrega</div><div style='font-size: 70%'>[Interfaz de servicio en memoria]</div>" .->14
+
+  end

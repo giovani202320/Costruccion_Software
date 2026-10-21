@@ -1,0 +1,58 @@
+graph LR
+  linkStyle default fill:#ffffff
+
+  subgraph diagram ["Dynamic View: San Camilo en Línea - API San Camilo"]
+    style diagram fill:#ffffff,stroke:#ffffff
+
+    6["<div style='font-weight: bold'>WhatsApp Business API / wa.me</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Canal externo usado mediante<br />enlaces wa.me para entregar<br />al comerciante el detalle de<br />su suborden; el MVP no<br />contrata la API Cloud de<br />pago.</div>"]
+    style 6 fill:#999999,stroke:#6b6b6b,color:#ffffff
+
+    subgraph 7 ["San Camilo en Línea"]
+      style 7 fill:#ffffff,stroke:#0b4884,color:#0b4884
+
+      subgraph 9 ["API San Camilo"]
+        style 9 fill:#ffffff,stroke:#2e6295,color:#2e6295
+
+        10["<div style='font-weight: bold'>Módulo Catálogo</div><div style='font-size: 70%; margin-top: 0px'>[Component: Módulo Python]</div><div style='font-size: 80%; margin-top:10px'>Administra puestos,<br />productos, precios,<br />disponibilidad y reserva de<br />stock mediante su interfaz<br />pública.</div>"]
+        style 10 fill:#85bbf0,stroke:#5d82a8,color:#000000
+        11["<div style='font-weight: bold'>Módulo Pedidos</div><div style='font-size: 70%; margin-top: 0px'>[Component: Módulo Python]</div><div style='font-size: 80%; margin-top:10px'>Orquesta el carrito<br />multi-puesto, el pedido<br />consolidado, las subórdenes y<br />su ciclo de vida.</div>"]
+        style 11 fill:#85bbf0,stroke:#5d82a8,color:#000000
+        12["<div style='font-weight: bold'>Módulo Pagos</div><div style='font-size: 70%; margin-top: 0px'>[Component: Módulo Python; puertos y adaptadores]</div><div style='font-size: 80%; margin-top:10px'>Registra comprobantes y<br />encapsula la validación<br />mediante un puerto de<br />pasarela de pago.</div>"]
+        style 12 fill:#85bbf0,stroke:#5d82a8,color:#000000
+        13["<div style='font-weight: bold'>Módulo Notificaciones</div><div style='font-size: 70%; margin-top: 0px'>[Component: Módulo Python; puertos y adaptadores]</div><div style='font-size: 80%; margin-top:10px'>Formatea avisos por puesto y<br />los encola para despacho<br />asíncrono.</div>"]
+        style 13 fill:#85bbf0,stroke:#5d82a8,color:#000000
+      end
+
+      15["<div style='font-weight: bold'>Worker de notificaciones</div><div style='font-size: 70%; margin-top: 0px'>[Container: Celery]</div><div style='font-size: 80%; margin-top:10px'>Consume avisos pendientes y<br />aplica reintentos sin<br />bloquear la confirmación del<br />pedido.</div>"]
+      style 15 fill:#438dd5,stroke:#2e6295,color:#ffffff
+      16[("<div style='font-weight: bold'>PostgreSQL</div><div style='font-size: 70%; margin-top: 0px'>[Container: PostgreSQL 15+]</div><div style='font-size: 80%; margin-top:10px'>Persistencia ACID con<br />esquemas lógicos aislados:<br />catalogo, pedidos, pagos,<br />notificaciones y usuarios.</div>")]
+      style 16 fill:#438dd5,stroke:#2e6295,color:#ffffff
+      17["<div style='font-weight: bold'>Redis</div><div style='font-size: 70%; margin-top: 0px'>[Container: Redis]</div><div style='font-size: 80%; margin-top:10px'>Caché del catálogo y cola de<br />tareas de notificación.</div>"]
+      style 17 fill:#438dd5,stroke:#2e6295,color:#ffffff
+      8["<div style='font-weight: bold'>PWA móvil</div><div style='font-size: 70%; margin-top: 0px'>[Container: HTML5, TailwindCSS, JavaScript, Service Worker]</div><div style='font-size: 80%; margin-top:10px'>Interfaz instalable y<br />responsiva para clientes,<br />comerciantes, repartidores y<br />administradores; tolera<br />conectividad intermitente.</div>"]
+      style 8 fill:#438dd5,stroke:#2e6295,color:#ffffff
+    end
+
+    6["<div style='font-weight: bold'>WhatsApp Business API / wa.me</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Canal externo usado mediante<br />enlaces wa.me para entregar<br />al comerciante el detalle de<br />su suborden; el MVP no<br />contrata la API Cloud de<br />pago.</div>"]
+    style 6 fill:#999999,stroke:#6b6b6b,color:#ffffff
+    8["<div style='font-weight: bold'>PWA móvil</div><div style='font-size: 70%; margin-top: 0px'>[Container: HTML5, TailwindCSS, JavaScript, Service Worker]</div><div style='font-size: 80%; margin-top:10px'>Interfaz instalable y<br />responsiva para clientes,<br />comerciantes, repartidores y<br />administradores; tolera<br />conectividad intermitente.</div>"]
+    style 8 fill:#438dd5,stroke:#2e6295,color:#ffffff
+    15["<div style='font-weight: bold'>Worker de notificaciones</div><div style='font-size: 70%; margin-top: 0px'>[Container: Celery]</div><div style='font-size: 80%; margin-top:10px'>Consume avisos pendientes y<br />aplica reintentos sin<br />bloquear la confirmación del<br />pedido.</div>"]
+    style 15 fill:#438dd5,stroke:#2e6295,color:#ffffff
+    16[("<div style='font-weight: bold'>PostgreSQL</div><div style='font-size: 70%; margin-top: 0px'>[Container: PostgreSQL 15+]</div><div style='font-size: 80%; margin-top:10px'>Persistencia ACID con<br />esquemas lógicos aislados:<br />catalogo, pedidos, pagos,<br />notificaciones y usuarios.</div>")]
+    style 16 fill:#438dd5,stroke:#2e6295,color:#ffffff
+    17["<div style='font-weight: bold'>Redis</div><div style='font-size: 70%; margin-top: 0px'>[Container: Redis]</div><div style='font-size: 80%; margin-top:10px'>Caché del catálogo y cola de<br />tareas de notificación.</div>"]
+    style 17 fill:#438dd5,stroke:#2e6295,color:#ffffff
+
+    8-. "<div>1. 1. Envía pedido,<br />modalidad, código de<br />operación y comprobante</div><div style='font-size: 70%'>[HTTPS/JSON]</div>" .->11
+    11-. "<div>2. 2. Reserva stock de cada<br />línea</div><div style='font-size: 70%'>[Interfaz de servicio en memoria]</div>" .->10
+    11-. "<div>3. 3. Registra y valida el<br />comprobante</div><div style='font-size: 70%'>[Interfaz de servicio en memoria]</div>" .->12
+    12-. "<div>4. 4. Persiste el pago y su<br />estado</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->16
+    11-. "<div>5. 5. Guarda atómicamente<br />pedido y subórdenes</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->16
+    11-. "<div>6. 6. Solicita avisos por<br />comerciante</div><div style='font-size: 70%'>[Interfaz de servicio en memoria]</div>" .->13
+    13-. "<div>7. 7. Encola avisos y<br />reintentos</div><div style='font-size: 70%'>[Redis protocol]</div>" .->17
+    15-. "<div>8. 8. Consume el aviso<br />pendiente</div><div style='font-size: 70%'>[Redis protocol]</div>" .->17
+    15-. "<div>9. 9. Entrega la comanda al<br />comerciante</div><div style='font-size: 70%'>[HTTPS (wa.me)]</div>" .->6
+    11-. "<div>10. 10. Devuelve pedido<br />confirmado y pagado</div><div style='font-size: 70%'>[HTTPS/JSON]</div>" .->8
+
+  end

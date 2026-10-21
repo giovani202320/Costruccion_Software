@@ -1,0 +1,25 @@
+@startuml contexto-manual
+!include <C4/C4_Context>
+
+LAYOUT_LEFT_RIGHT()
+title Contexto de San Camilo en Línea (C4-PlantUML escrito a mano)
+
+Person(cliente, "Cliente", "Compra productos de varios puestos y consulta sus pedidos.")
+Person(comerciante, "Comerciante", "Gestiona catálogo y atiende subórdenes.")
+Person(repartidor, "Repartidor", "Confirma entregas delivery.")
+Person(admin, "Administrador", "Verifica comprobantes y supervisa pedidos.")
+
+System(san_camilo, "San Camilo en Línea", "Catálogo por puesto, pedidos multi-puesto, pagos y coordinación de entregas.")
+System_Ext(yape_plin, "Yape / Plin", "Billeteras externas; el MVP concilia comprobantes manualmente.")
+System_Ext(whatsapp, "WhatsApp Business API / wa.me", "Canal externo de avisos al comerciante.")
+
+Rel(cliente, san_camilo, "Compra y consulta pedidos")
+Rel(comerciante, san_camilo, "Gestiona catálogo y subórdenes")
+Rel(repartidor, san_camilo, "Confirma entregas delivery")
+Rel(admin, san_camilo, "Verifica comprobantes")
+Rel(cliente, yape_plin, "Realiza la transferencia")
+Rel(san_camilo, yape_plin, "Guía la transferencia y recibe comprobante", "Deep link / HTTPS")
+Rel(san_camilo, whatsapp, "Entrega avisos por puesto", "HTTPS (wa.me)")
+
+SHOW_LEGEND()
+@enduml

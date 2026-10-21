@@ -1,0 +1,116 @@
+@startuml
+title <size:24>Deployment View: San Camilo en Línea - Producción</size>\n<size:24>Despliegue del MVP en un VPS con Docker Compose.</size>
+
+set separator none
+left to right direction
+skinparam ranksep 60
+skinparam nodesep 30
+hide stereotype
+
+<style>
+  root {
+    BackgroundColor: #ffffff;
+    FontColor: #444444;
+  }
+  // Element,Container
+  .Element-RWxlbWVudCxDb250YWluZXI= {
+    BackgroundColor: #438dd5;
+    LineColor: #2e6295;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #ffffff;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Element,Container,Database
+  .Element-RWxlbWVudCxDb250YWluZXIsRGF0YWJhc2U= {
+    BackgroundColor: #438dd5;
+    LineColor: #2e6295;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #ffffff;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Element,Container,Queue
+  .Element-RWxlbWVudCxDb250YWluZXIsUXVldWU= {
+    BackgroundColor: #438dd5;
+    LineColor: #2e6295;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #ffffff;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Element,Container,Web Browser
+  .Element-RWxlbWVudCxDb250YWluZXIsV2ViIEJyb3dzZXI= {
+    BackgroundColor: #438dd5;
+    LineColor: #2e6295;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #ffffff;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Element,Container,Worker
+  .Element-RWxlbWVudCxDb250YWluZXIsV29ya2Vy {
+    BackgroundColor: #438dd5;
+    LineColor: #2e6295;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #ffffff;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Relationship
+  .Relationship-UmVsYXRpb25zaGlw {
+    LineThickness: 2;
+    LineStyle: 10-10;
+    LineColor: #707070;
+    FontColor: #707070;
+    FontSize: 24;
+  }
+  // Element
+  .DeploymentNode-RWxlbWVudA== {
+    BackgroundColor: #ffffff;
+    LineColor: #444444;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #444444;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+</style>
+
+rectangle "Dispositivo del usuario\n<size:16>[Deployment Node: Android / navegador web]</size>" <<DeploymentNode-RWxlbWVudA==>> as Producción.Dispositivodelusuario {
+  rectangle "==PWA móvil\n<size:16>[Container: HTML5, TailwindCSS, JavaScript, Service Worker]</size>\n\nInterfaz instalable y responsiva para clientes, comerciantes, repartidores y administradores; tolera conectividad intermitente." <<Element-RWxlbWVudCxDb250YWluZXIsV2ViIEJyb3dzZXI=>> as Producción.Dispositivodelusuario.PWAmóvil_1
+}
+
+rectangle "VPS de bajo costo\n<size:16>[Deployment Node: Ubuntu 24.04, 2 vCPU, 4 GB RAM]</size>" <<DeploymentNode-RWxlbWVudA==>> as Producción.VPSdebajocosto {
+  rectangle "Docker Compose\n<size:16>[Deployment Node: Docker Compose]</size>" <<DeploymentNode-RWxlbWVudA==>> as Producción.VPSdebajocosto.DockerCompose {
+    rectangle "==API San Camilo\n<size:16>[Container: Python, FastAPI o Django, REST/JSON]</size>\n\nMonolito modular que expone los casos de uso mediante una API REST y mantiene fronteras de dominio explícitas." <<Element-RWxlbWVudCxDb250YWluZXI=>> as Producción.VPSdebajocosto.DockerCompose.APISanCamilo_1
+    hexagon "==Worker de notificaciones\n<size:16>[Container: Celery]</size>\n\nConsume avisos pendientes y aplica reintentos sin bloquear la confirmación del pedido." <<Element-RWxlbWVudCxDb250YWluZXIsV29ya2Vy>> as Producción.VPSdebajocosto.DockerCompose.Workerdenotificaciones_1
+    database "==PostgreSQL\n<size:16>[Container: PostgreSQL 15+]</size>\n\nPersistencia ACID con esquemas lógicos aislados: catalogo, pedidos, pagos, notificaciones y usuarios." <<Element-RWxlbWVudCxDb250YWluZXIsRGF0YWJhc2U=>> as Producción.VPSdebajocosto.DockerCompose.PostgreSQL_1
+    queue "==Redis\n<size:16>[Container: Redis]</size>\n\nCaché del catálogo y cola de tareas de notificación." <<Element-RWxlbWVudCxDb250YWluZXIsUXVldWU=>> as Producción.VPSdebajocosto.DockerCompose.Redis_1
+  }
+
+}
+
+Producción.VPSdebajocosto.DockerCompose.APISanCamilo_1 --> Producción.Dispositivodelusuario.PWAmóvil_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Devuelve el estado actualizado del pedido\n<size:16>[HTTPS/JSON]</size>"
+Producción.Dispositivodelusuario.PWAmóvil_1 --> Producción.VPSdebajocosto.DockerCompose.APISanCamilo_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Invoca casos de uso\n<size:16>[HTTPS/JSON]</size>"
+Producción.VPSdebajocosto.DockerCompose.APISanCamilo_1 --> Producción.VPSdebajocosto.DockerCompose.PostgreSQL_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Lee y escribe su esquema catalogo\n<size:16>[SQL/TCP]</size>"
+Producción.VPSdebajocosto.DockerCompose.APISanCamilo_1 --> Producción.VPSdebajocosto.DockerCompose.Redis_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Lee y actualiza caché de catálogo\n<size:16>[Redis protocol]</size>"
+Producción.VPSdebajocosto.DockerCompose.Workerdenotificaciones_1 --> Producción.VPSdebajocosto.DockerCompose.Redis_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Consume avisos pendientes\n<size:16>[Redis protocol]</size>"
+
+@enduml

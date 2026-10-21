@@ -143,6 +143,38 @@ stateDiagram-v2
 
 ---
 
+## Arquitectura C4 (Lab 06)
+
+El modelo C4 se mantiene como arquitectura como código en [`docs/architecture/c4/workspace.dsl`](docs/architecture/c4/workspace.dsl). El inventario, las exportaciones y la revisión están en [`docs/architecture/c4/`](docs/architecture/c4/).
+
+```mermaid
+graph LR
+  subgraph diagram ["System Context View: San Camilo en Línea"]
+    cliente["Cliente<br/>[Person]"]
+    comerciante["Comerciante<br/>[Person]"]
+    repartidor["Repartidor<br/>[Person]"]
+    administrador["Administrador<br/>[Person]"]
+    yape["Yape / Plin<br/>[Software System Externo]"]
+    whatsapp["WhatsApp Business API / wa.me<br/>[Software System Externo]"]
+    sistema["San Camilo en Línea<br/>[Software System]"]
+    cliente -. "Compra productos y consulta pedidos" .-> sistema
+    comerciante -. "Gestiona catálogo y subórdenes" .-> sistema
+    repartidor -. "Confirma entregas delivery" .-> sistema
+    administrador -. "Verifica comprobantes" .-> sistema
+    cliente -. "Realiza transferencia" .-> yape
+    sistema -. "Guía transferencia y recibe comprobante<br/>[Deep link / HTTPS]" .-> yape
+    sistema -. "Entrega avisos por puesto<br/>[HTTPS (wa.me)]" .-> whatsapp
+  end
+```
+
+| Vista | Fuente | Imagen |
+|---|---|---|
+| Contexto | [PlantUML](docs/architecture/c4/export/structurizr-systemContext.puml) | [PNG](docs/architecture/c4/img/structurizr-systemContext.png) |
+| Contenedores | [PlantUML](docs/architecture/c4/export/structurizr-container.puml) | [PNG](docs/architecture/c4/img/structurizr-container.png) |
+| Componentes de API | [PlantUML](docs/architecture/c4/export/structurizr-componentApi.puml) | [PNG](docs/architecture/c4/img/structurizr-componentApi.png) |
+| Dinámica: confirmar con Yape | [PlantUML](docs/architecture/c4/export/structurizr-confirmarYape.puml) | [PNG](docs/architecture/c4/img/structurizr-confirmarYape.png) |
+| Despliegue: Producción | [PlantUML](docs/architecture/c4/export/structurizr-deploymentProduccion.puml) | [PNG](docs/architecture/c4/img/structurizr-deploymentProduccion.png) |
+
 ## Reflexión sobre el uso de la IA (5 a 8 líneas)
 
 El asistente de IA demostró ser una herramienta de gran valor para acelerar la redacción formal de escenarios de calidad y estructurar la sintaxis de diagramas en Mermaid, PlantUML y Python Diagrams. Sin embargo, presentó sesgos notorios hacia la sobre-ingeniería inicial (sugiriendo microservicios con Kubernetes y brokers pesados) y alucinó capacidades inexistentes, como afirmar que Yape dispone de una API pública gratuita para pequeños comerciantes. La lección fundamental para el equipo fue que la IA propone con rapidez pero carece de criterio sobre las restricciones del mundo real; por tanto, el juicio crítico humano y la validación técnica contra costos reales, plazos estrictos y el contexto operativo del usuario final son insustituibles en la ingeniería de software.

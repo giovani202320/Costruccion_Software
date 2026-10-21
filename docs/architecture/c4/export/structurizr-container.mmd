@@ -1,0 +1,48 @@
+graph LR
+  linkStyle default fill:#ffffff
+
+  subgraph diagram ["Container View: San Camilo en Línea"]
+    style diagram fill:#ffffff,stroke:#ffffff
+
+    1["<div style='font-weight: bold'>Cliente</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Explora catálogos, consolida<br />compras de varios puestos,<br />registra su transferencia y<br />consulta pedidos.</div>"]
+    style 1 fill:#08427b,stroke:#052e56,color:#ffffff
+    2["<div style='font-weight: bold'>Comerciante</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Publica productos, actualiza<br />disponibilidad y prepara las<br />subórdenes de su puesto.</div>"]
+    style 2 fill:#08427b,stroke:#052e56,color:#ffffff
+    3["<div style='font-weight: bold'>Repartidor</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Gestiona la entrega<br />consolidada de pedidos con<br />modalidad delivery.</div>"]
+    style 3 fill:#08427b,stroke:#052e56,color:#ffffff
+    4["<div style='font-weight: bold'>Administrador</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Verifica comprobantes de pago<br />y supervisa la operación de<br />la plataforma.</div>"]
+    style 4 fill:#08427b,stroke:#052e56,color:#ffffff
+    5["<div style='font-weight: bold'>Yape / Plin</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Billeteras externas usadas<br />por el cliente para realizar<br />transferencias; el MVP<br />registra y concilia<br />comprobantes de forma manual.</div>"]
+    style 5 fill:#999999,stroke:#6b6b6b,color:#ffffff
+    6["<div style='font-weight: bold'>WhatsApp Business API / wa.me</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Canal externo usado mediante<br />enlaces wa.me para entregar<br />al comerciante el detalle de<br />su suborden; el MVP no<br />contrata la API Cloud de<br />pago.</div>"]
+    style 6 fill:#999999,stroke:#6b6b6b,color:#ffffff
+
+    subgraph 7 ["San Camilo en Línea"]
+      style 7 fill:#ffffff,stroke:#0b4884,color:#0b4884
+
+      15["<div style='font-weight: bold'>Worker de notificaciones</div><div style='font-size: 70%; margin-top: 0px'>[Container: Celery]</div><div style='font-size: 80%; margin-top:10px'>Consume avisos pendientes y<br />aplica reintentos sin<br />bloquear la confirmación del<br />pedido.</div>"]
+      style 15 fill:#438dd5,stroke:#2e6295,color:#ffffff
+      16[("<div style='font-weight: bold'>PostgreSQL</div><div style='font-size: 70%; margin-top: 0px'>[Container: PostgreSQL 15+]</div><div style='font-size: 80%; margin-top:10px'>Persistencia ACID con<br />esquemas lógicos aislados:<br />catalogo, pedidos, pagos,<br />notificaciones y usuarios.</div>")]
+      style 16 fill:#438dd5,stroke:#2e6295,color:#ffffff
+      17["<div style='font-weight: bold'>Redis</div><div style='font-size: 70%; margin-top: 0px'>[Container: Redis]</div><div style='font-size: 80%; margin-top:10px'>Caché del catálogo y cola de<br />tareas de notificación.</div>"]
+      style 17 fill:#438dd5,stroke:#2e6295,color:#ffffff
+      8["<div style='font-weight: bold'>PWA móvil</div><div style='font-size: 70%; margin-top: 0px'>[Container: HTML5, TailwindCSS, JavaScript, Service Worker]</div><div style='font-size: 80%; margin-top:10px'>Interfaz instalable y<br />responsiva para clientes,<br />comerciantes, repartidores y<br />administradores; tolera<br />conectividad intermitente.</div>"]
+      style 8 fill:#438dd5,stroke:#2e6295,color:#ffffff
+      9["<div style='font-weight: bold'>API San Camilo</div><div style='font-size: 70%; margin-top: 0px'>[Container: Python, FastAPI o Django, REST/JSON]</div><div style='font-size: 80%; margin-top:10px'>Monolito modular que expone<br />los casos de uso mediante una<br />API REST y mantiene fronteras<br />de dominio explícitas.</div>"]
+      style 9 fill:#438dd5,stroke:#2e6295,color:#ffffff
+    end
+
+    1-. "<div>Realiza la transferencia del<br />pedido</div><div style='font-size: 70%'></div>" .->5
+    1-. "<div>Usa la aplicación</div><div style='font-size: 70%'>[HTTPS]</div>" .->8
+    2-. "<div>Usa la aplicación</div><div style='font-size: 70%'>[HTTPS]</div>" .->8
+    3-. "<div>Usa la aplicación</div><div style='font-size: 70%'>[HTTPS]</div>" .->8
+    4-. "<div>Usa la aplicación</div><div style='font-size: 70%'>[HTTPS]</div>" .->8
+    8-. "<div>Guía la transferencia y<br />recibe el comprobante</div><div style='font-size: 70%'>[Deep link / HTTPS]</div>" .->5
+    8-. "<div>Invoca casos de uso</div><div style='font-size: 70%'>[HTTPS/JSON]</div>" .->9
+    9-. "<div>Lee y escribe su esquema<br />catalogo</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->16
+    9-. "<div>Lee y actualiza caché de<br />catálogo</div><div style='font-size: 70%'>[Redis protocol]</div>" .->17
+    15-. "<div>Consume avisos pendientes</div><div style='font-size: 70%'>[Redis protocol]</div>" .->17
+    15-. "<div>Entrega avisos por puesto</div><div style='font-size: 70%'>[HTTPS (wa.me)]</div>" .->6
+    9-. "<div>Devuelve el estado<br />actualizado del pedido</div><div style='font-size: 70%'>[HTTPS/JSON]</div>" .->8
+
+  end

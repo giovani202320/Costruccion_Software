@@ -1,0 +1,3 @@
+# San Camilo en Línea, explicado sin jerga
+
+San Camilo en Línea permite comprar desde el celular productos de distintos puestos del mercado en un solo pedido. Los comerciantes publican sus productos y reciben el detalle de lo que deben preparar; los repartidores coordinan las entregas a domicilio y la administración revisa los comprobantes. El cliente paga mediante Yape o Plin y registra su comprobante en la plataforma. Después, cada puesto recibe su aviso por WhatsApp. Si WhatsApp no está disponible temporalmente, el pedido queda guardado y el aviso se reintenta, por lo que la compra no se pierde.

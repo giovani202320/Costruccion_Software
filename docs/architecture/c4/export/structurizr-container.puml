@@ -1,0 +1,148 @@
+@startuml
+title <size:24>Container View: San Camilo en Línea</size>\n<size:24>Nivel 2 - Contenedores desplegables del monolito modular.</size>
+
+set separator none
+left to right direction
+skinparam ranksep 60
+skinparam nodesep 30
+hide stereotype
+
+<style>
+  root {
+    BackgroundColor: #ffffff;
+    FontColor: #444444;
+  }
+  // Element,Container
+  .Element-RWxlbWVudCxDb250YWluZXI= {
+    BackgroundColor: #438dd5;
+    LineColor: #2e6295;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #ffffff;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Element,Container,Database
+  .Element-RWxlbWVudCxDb250YWluZXIsRGF0YWJhc2U= {
+    BackgroundColor: #438dd5;
+    LineColor: #2e6295;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #ffffff;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Element,Container,Queue
+  .Element-RWxlbWVudCxDb250YWluZXIsUXVldWU= {
+    BackgroundColor: #438dd5;
+    LineColor: #2e6295;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #ffffff;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Element,Container,Web Browser
+  .Element-RWxlbWVudCxDb250YWluZXIsV2ViIEJyb3dzZXI= {
+    BackgroundColor: #438dd5;
+    LineColor: #2e6295;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #ffffff;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Element,Container,Worker
+  .Element-RWxlbWVudCxDb250YWluZXIsV29ya2Vy {
+    BackgroundColor: #438dd5;
+    LineColor: #2e6295;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #ffffff;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Element,Person
+  .Element-RWxlbWVudCxQZXJzb24= {
+    BackgroundColor: #08427b;
+    LineColor: #052e56;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #ffffff;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Element,Software System,Externo
+  .Element-RWxlbWVudCxTb2Z0d2FyZSBTeXN0ZW0sRXh0ZXJubw== {
+    BackgroundColor: #999999;
+    LineColor: #6b6b6b;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #ffffff;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Relationship
+  .Relationship-UmVsYXRpb25zaGlw {
+    LineThickness: 2;
+    LineStyle: 10-10;
+    LineColor: #707070;
+    FontColor: #707070;
+    FontSize: 24;
+  }
+  // San Camilo en Línea
+  .Boundary-U2FuIENhbWlsbyBlbiBMw61uZWE= {
+    BackgroundColor: #ffffff;
+    LineColor: #0b4884;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #ffffff;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+</style>
+
+person "==Cliente\n<size:16>[Person]</size>\n\nExplora catálogos, consolida compras de varios puestos, registra su transferencia y consulta pedidos." <<Element-RWxlbWVudCxQZXJzb24=>> as Cliente
+person "==Comerciante\n<size:16>[Person]</size>\n\nPublica productos, actualiza disponibilidad y prepara las subórdenes de su puesto." <<Element-RWxlbWVudCxQZXJzb24=>> as Comerciante
+person "==Repartidor\n<size:16>[Person]</size>\n\nGestiona la entrega consolidada de pedidos con modalidad delivery." <<Element-RWxlbWVudCxQZXJzb24=>> as Repartidor
+person "==Administrador\n<size:16>[Person]</size>\n\nVerifica comprobantes de pago y supervisa la operación de la plataforma." <<Element-RWxlbWVudCxQZXJzb24=>> as Administrador
+rectangle "==Yape / Plin\n<size:16>[Software System]</size>\n\nBilleteras externas usadas por el cliente para realizar transferencias; el MVP registra y concilia comprobantes de forma manual." <<Element-RWxlbWVudCxTb2Z0d2FyZSBTeXN0ZW0sRXh0ZXJubw==>> as YapePlin
+rectangle "==WhatsApp Business API / wa.me\n<size:16>[Software System]</size>\n\nCanal externo usado mediante enlaces wa.me para entregar al comerciante el detalle de su suborden; el MVP no contrata la API Cloud de pago." <<Element-RWxlbWVudCxTb2Z0d2FyZSBTeXN0ZW0sRXh0ZXJubw==>> as WhatsAppBusinessAPIwame
+
+rectangle "San Camilo en Línea\n<size:16>[Software System]</size>" <<Boundary-U2FuIENhbWlsbyBlbiBMw61uZWE=>> {
+  hexagon "==Worker de notificaciones\n<size:16>[Container: Celery]</size>\n\nConsume avisos pendientes y aplica reintentos sin bloquear la confirmación del pedido." <<Element-RWxlbWVudCxDb250YWluZXIsV29ya2Vy>> as SanCamiloenLínea.Workerdenotificaciones
+  database "==PostgreSQL\n<size:16>[Container: PostgreSQL 15+]</size>\n\nPersistencia ACID con esquemas lógicos aislados: catalogo, pedidos, pagos, notificaciones y usuarios." <<Element-RWxlbWVudCxDb250YWluZXIsRGF0YWJhc2U=>> as SanCamiloenLínea.PostgreSQL
+  queue "==Redis\n<size:16>[Container: Redis]</size>\n\nCaché del catálogo y cola de tareas de notificación." <<Element-RWxlbWVudCxDb250YWluZXIsUXVldWU=>> as SanCamiloenLínea.Redis
+  rectangle "==PWA móvil\n<size:16>[Container: HTML5, TailwindCSS, JavaScript, Service Worker]</size>\n\nInterfaz instalable y responsiva para clientes, comerciantes, repartidores y administradores; tolera conectividad intermitente." <<Element-RWxlbWVudCxDb250YWluZXIsV2ViIEJyb3dzZXI=>> as SanCamiloenLínea.PWAmóvil
+  rectangle "==API San Camilo\n<size:16>[Container: Python, FastAPI o Django, REST/JSON]</size>\n\nMonolito modular que expone los casos de uso mediante una API REST y mantiene fronteras de dominio explícitas." <<Element-RWxlbWVudCxDb250YWluZXI=>> as SanCamiloenLínea.APISanCamilo
+}
+
+Cliente --> YapePlin <<Relationship-UmVsYXRpb25zaGlw>> : "Realiza la transferencia del pedido"
+Cliente --> SanCamiloenLínea.PWAmóvil <<Relationship-UmVsYXRpb25zaGlw>> : "Usa la aplicación\n<size:16>[HTTPS]</size>"
+Comerciante --> SanCamiloenLínea.PWAmóvil <<Relationship-UmVsYXRpb25zaGlw>> : "Usa la aplicación\n<size:16>[HTTPS]</size>"
+Repartidor --> SanCamiloenLínea.PWAmóvil <<Relationship-UmVsYXRpb25zaGlw>> : "Usa la aplicación\n<size:16>[HTTPS]</size>"
+Administrador --> SanCamiloenLínea.PWAmóvil <<Relationship-UmVsYXRpb25zaGlw>> : "Usa la aplicación\n<size:16>[HTTPS]</size>"
+SanCamiloenLínea.PWAmóvil --> YapePlin <<Relationship-UmVsYXRpb25zaGlw>> : "Guía la transferencia y recibe el comprobante\n<size:16>[Deep link / HTTPS]</size>"
+SanCamiloenLínea.PWAmóvil --> SanCamiloenLínea.APISanCamilo <<Relationship-UmVsYXRpb25zaGlw>> : "Invoca casos de uso\n<size:16>[HTTPS/JSON]</size>"
+SanCamiloenLínea.APISanCamilo --> SanCamiloenLínea.PostgreSQL <<Relationship-UmVsYXRpb25zaGlw>> : "Lee y escribe su esquema catalogo\n<size:16>[SQL/TCP]</size>"
+SanCamiloenLínea.APISanCamilo --> SanCamiloenLínea.Redis <<Relationship-UmVsYXRpb25zaGlw>> : "Lee y actualiza caché de catálogo\n<size:16>[Redis protocol]</size>"
+SanCamiloenLínea.Workerdenotificaciones --> SanCamiloenLínea.Redis <<Relationship-UmVsYXRpb25zaGlw>> : "Consume avisos pendientes\n<size:16>[Redis protocol]</size>"
+SanCamiloenLínea.Workerdenotificaciones --> WhatsAppBusinessAPIwame <<Relationship-UmVsYXRpb25zaGlw>> : "Entrega avisos por puesto\n<size:16>[HTTPS (wa.me)]</size>"
+SanCamiloenLínea.APISanCamilo --> SanCamiloenLínea.PWAmóvil <<Relationship-UmVsYXRpb25zaGlw>> : "Devuelve el estado actualizado del pedido\n<size:16>[HTTPS/JSON]</size>"
+
+@enduml

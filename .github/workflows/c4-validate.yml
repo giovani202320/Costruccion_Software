@@ -1,0 +1,32 @@
+name: Validar modelo C4
+
+on:
+  push:
+    paths:
+      - 'docs/architecture/c4/**'
+      - '.github/workflows/c4-validate.yml'
+  pull_request:
+    paths:
+      - 'docs/architecture/c4/**'
+      - '.github/workflows/c4-validate.yml'
+
+jobs:
+  structurizr-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+      - name: Validar workspace DSL
+        run: >-
+          docker run --rm
+          -v "${{ github.workspace }}:/workspace"
+          structurizr/cli:latest
+          validate -workspace /workspace/docs/architecture/c4/workspace.dsl
+      - name: Regenerar exportaciones PlantUML y Mermaid
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/workspace" structurizr/cli:latest \
+            export -workspace /workspace/docs/architecture/c4/workspace.dsl \
+            -format plantuml -output /workspace/docs/architecture/c4/export
+          docker run --rm -v "${{ github.workspace }}:/workspace" structurizr/cli:latest \
+            export -workspace /workspace/docs/architecture/c4/workspace.dsl \
+            -format mermaid -output /workspace/docs/architecture/c4/export
