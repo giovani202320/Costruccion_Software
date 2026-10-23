@@ -27,6 +27,17 @@ from pedidos.eventos import (
     AuditoriaPedidos,
     Suscriptor,
 )
+from pedidos.ia import (
+    ProveedorLLM,
+    MockLLMAdapter,
+    LocalAdapter,
+    ConCache,
+    Guardrail,
+    SinPrecios,
+    LongitudMaxima,
+    SinAfirmacionesProhibidas,
+    NormalizadorProductos,
+)
 
 
 # ============================================================================
@@ -255,3 +266,107 @@ def test_observer_desuscribir():
     publicador.publicar("pedido_pagado", {"id": 2, "celular": "959000222", "total": 20.0})
     # No debe haberse agregado ningún mensaje nuevo
     assert len(bandeja) == 1
+
+
+# ============================================================================
+# Pruebas para E5: Aislamiento de IA (Strategy, Adapter, Decorator, Chain)
+# ============================================================================
+
+def test_ia_mock_adapter_normaliza_correctamente():
+    """Verifica que el adaptador simulado sustituye al LLM sin requerir API."""
+    adapter = MockLLMAdapter()
+    resultado = adapter.completar("Normaliza el producto: 'papa amarila'")
+    assert resultado == "Papa Amarilla"
+    assert adapter.llamadas == 1
+
+
+def test_ia_decorator_con_cache_evita_llamadas_repetidas():
+    """
+    DECORATOR (Caché): Demuestra que ante el mismo prompt, el proveedor
+    interno solo se invoca una única vez, evitando cobros y latencia redundante.
+    """
+    mock_adapter = MockLLMAdapter()
+    con_cache = ConCache(mock_adapter)
+    prompt = "Normaliza: 'queso paria artesanal'"
+
+    # Primera llamada: consulta al adaptador
+    res1 = con_cache.completar(prompt)
+    assert res1 == "Queso Paria Artesanal"
+    assert mock_adapter.llamadas == 1
+
+    # Segunda llamada: servida inmediatamente desde la memoria caché
+    res2 = con_cache.completar(prompt)
+    assert res2 == "Queso Paria Artesanal"
+    assert mock_adapter.llamadas == 1  # No se volvió a llamar al LLM!
+    assert con_cache.llamadas_cache == 1
+
+
+def test_ia_guardrail_sin_precios_bloquea_precio_inventado():
+    """
+    CHAIN OF RESPONSIBILITY (Guardrail): Bloquea si la IA inventa precios
+    como 'S/ 3.50' o '$ 1.20', protegiendo la consistencia del catálogo.
+    """
+    guardrail = SinPrecios()
+
+    # Salida limpia pasa sin problemas
+    assert guardrail.validar("Rocoto Arequipeño") == "Rocoto Arequipeño"
+
+    # Salida con precio en soles genera error
+    with pytest.raises(ValueError, match="Guardrail: la IA incluyó un precio"):
+        guardrail.validar("Papa Amarilla a solo S/ 4.50 el kilo")
+
+    # Salida con símbolo $ también es bloqueada
+    with pytest.raises(ValueError, match="Guardrail: la IA incluyó un precio"):
+        guardrail.validar("Queso Paria por $ 5.00")
+
+
+def test_ia_guardrail_longitud_maxima_bloquea_alucinaciones():
+    """
+    CHAIN OF RESPONSIBILITY (Guardrail): Bloquea textos excesivos
+    que desbordarían las pantallas de celulares de gama baja en el mercado.
+    """
+    guardrail = LongitudMaxima(max_caracteres=30)
+
+    # Texto dentro del límite (<= 30 caracteres)
+    assert guardrail.validar("Chirimoya Cumbe") == "Chirimoya Cumbe"
+
+    # Texto que excede los 30 caracteres
+    texto_largo = "Deliciosa chirimoya cumbe fresca del valle de majes cosechada hoy"
+    with pytest.raises(ValueError, match="Guardrail: la salida de la IA excedió el límite"):
+        guardrail.validar(texto_largo)
+
+
+def test_ia_guardrail_sin_afirmaciones_prohibidas():
+    """Bloquea reclamos médicos o afirmaciones no autorizadas por regulación."""
+    guardrail = SinAfirmacionesProhibidas()
+
+    with pytest.raises(ValueError, match="Guardrail: afirmación no permitida detectada 'cura'"):
+        guardrail.validar("Zumo de Naranja que cura cualquier resfrío")
+
+
+def test_ia_normalizador_productos_flujo_integrado_exitoso():
+    """
+    Verifica el flujo integrado de NormalizadorProductos con Strategy + Cache + Cadena completa.
+    """
+    mock = MockLLMAdapter()
+    cache = ConCache(mock)
+    normalizador = NormalizadorProductos(proveedor=cache)
+
+    resultado = normalizador.normalizar("papa amarila")
+    assert resultado == "Papa Amarilla"
+    assert mock.llamadas == 1
+
+    # Segunda llamada normalizando el mismo término: protegida por caché
+    resultado2 = normalizador.normalizar("papa amarila")
+    assert resultado2 == "Papa Amarilla"
+    assert mock.llamadas == 1
+
+
+def test_ia_normalizador_bloquea_cuando_llm_alucina_precio():
+    """Verifica que el orquestador frena respuestas alucinadas con precios."""
+    # Simulamos que el LLM responde con un precio inventado
+    mock_alucinador = MockLLMAdapter(respuesta_defecto="Papa Huayro S/ 3.80 kg")
+    normalizador = NormalizadorProductos(proveedor=mock_alucinador)
+
+    with pytest.raises(ValueError, match="Guardrail: la IA incluyó un precio"):
+        normalizador.normalizar("papa huayro")

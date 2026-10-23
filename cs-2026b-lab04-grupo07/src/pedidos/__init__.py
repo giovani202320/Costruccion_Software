@@ -21,6 +21,17 @@ from .eventos import (
     ActualizadorReportes,
     AuditoriaPedidos,
 )
+from .ia import (
+    ProveedorLLM,
+    MockLLMAdapter,
+    LocalAdapter,
+    ConCache,
+    Guardrail,
+    SinPrecios,
+    LongitudMaxima,
+    SinAfirmacionesProhibidas,
+    NormalizadorProductos,
+)
 
 __all__ = [
     "Pedido",
@@ -45,4 +56,13 @@ __all__ = [
     "NotificadorWhatsApp",
     "ActualizadorReportes",
     "AuditoriaPedidos",
+    "ProveedorLLM",
+    "MockLLMAdapter",
+    "LocalAdapter",
+    "ConCache",
+    "Guardrail",
+    "SinPrecios",
+    "LongitudMaxima",
+    "SinAfirmacionesProhibidas",
+    "NormalizadorProductos",
 ]
