@@ -16,9 +16,17 @@ from pedidos.pagos import (
     YapeAdapter,
     PlinAdapter,
     ConReintentos,
+    ConLogTransacciones,
 )
 from pedidos.externos import YapeSDK, PlinClient
 from pedidos.servicio import ServicioPedidos
+from pedidos.eventos import (
+    PublicadorEventos,
+    NotificadorWhatsApp,
+    ActualizadorReportes,
+    AuditoriaPedidos,
+    Suscriptor,
+)
 
 
 # ============================================================================
@@ -168,3 +176,82 @@ def test_state_cancelacion_desde_borrador_y_confirmado():
     # Desde CANCELADO no se puede confirmar
     with pytest.raises(ValueError, match="El pedido está cancelado"):
         p2.confirmar()
+
+
+# ============================================================================
+# Pruebas para E4: Observer y Decorator (Notificaciones y Responsabilidades Transversales)
+# ============================================================================
+
+def test_decorator_composicion_reintentos_y_log():
+    """
+    Verifica la composición de decoradores: ConLogTransacciones envolviendo ConReintentos.
+    Demuestra separación limpia entre tolerancia a fallos y auditoría.
+    """
+    sdk = YapeSDK(fallas=1)  # 1 timeout, luego éxito
+    adapter = YapeAdapter(sdk)
+    con_reintentos = ConReintentos(adapter, intentos=3)
+    con_logging = ConLogTransacciones(con_reintentos)
+
+    resultado = con_logging.cobrar(45.0, "959333222")
+
+    assert resultado.aprobado is True
+    assert resultado.operacion == "YAP-0002"
+    assert len(con_logging.logs) == 2
+    assert "INICIO: Cobro de S/ 45.00 a 959333222" in con_logging.logs[0]
+    assert "FIN: Cobro APROBADO" in con_logging.logs[1]
+
+
+def test_observer_notifica_a_multiples_suscriptores():
+    """Verifica que PublicadorEventos propaga los eventos a todos los suscriptores."""
+    publicador = PublicadorEventos()
+    bandeja_ws = []
+    bandeja_rep = []
+
+    publicador.suscribir("pedido_pagado", NotificadorWhatsApp(bandeja_ws))
+    publicador.suscribir("pedido_pagado", ActualizadorReportes(bandeja_rep))
+
+    publicador.publicar("pedido_pagado", {"id": 101, "celular": "959123456", "total": 85.50})
+
+    assert bandeja_ws == ["whatsapp:959123456:Pedido 101 pagado"]
+    assert bandeja_rep == ["reporte:101:85.50"]
+
+
+def test_observer_nuevo_suscriptor_sin_tocar_el_servicio():
+    """
+    Demuestra OCP en eventos: se añade un suscriptor de auditoría contable
+    directamente al publicador sin alterar ni una sola línea de ServicioPedidos.
+    """
+    servicio = ServicioPedidos()
+    auditor = AuditoriaPedidos()
+
+    # Suscripción de nuevo interesado en tiempo de ejecución
+    servicio.publicador.suscribir("pedido_pagado", auditor)
+
+    pedido = Pedido(id=55, celular="959444555", lineas=[Linea("Queso Paria Especial", 2.0, 18.0)])
+    estado = servicio.confirmar_y_pagar(pedido, "YAPE")
+
+    assert estado == "PAGADO"
+    # El nuevo suscriptor recibió los datos completos
+    assert len(auditor.registros) == 1
+    registro = auditor.registros[0]
+    assert registro["evento"] == "pedido_pagado"
+    assert registro["id"] == 55
+    assert registro["celular"] == "959444555"
+    assert registro["total"] == 36.0
+
+
+def test_observer_desuscribir():
+    """Verifica que un suscriptor puede darse de baja y deja de recibir eventos."""
+    publicador = PublicadorEventos()
+    bandeja = []
+    observador = NotificadorWhatsApp(bandeja)
+
+    publicador.suscribir("pedido_pagado", observador)
+    publicador.publicar("pedido_pagado", {"id": 1, "celular": "959000111", "total": 10.0})
+    assert len(bandeja) == 1
+
+    # Desuscribir
+    publicador.desuscribir("pedido_pagado", observador)
+    publicador.publicar("pedido_pagado", {"id": 2, "celular": "959000222", "total": 20.0})
+    # No debe haberse agregado ningún mensaje nuevo
+    assert len(bandeja) == 1

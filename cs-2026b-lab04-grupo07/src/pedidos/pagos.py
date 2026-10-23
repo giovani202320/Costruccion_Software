@@ -77,6 +77,22 @@ class ConReintentos(PasarelaPago):
         return ResultadoPago(aprobado=False)
 
 
+class ConLogTransacciones(PasarelaPago):
+    """
+    DECORATOR: Agrega registro y auditoría de llamadas sin modificar la pasarela subyacente.
+    Demuestra composición de decoradores (ConLogTransacciones envolviendo ConReintentos o viceversa).
+    """
+    def __init__(self, interna: PasarelaPago) -> None:
+        self._interna = interna
+        self.logs: List[str] = []
+
+    def cobrar(self, monto: float, celular: str) -> ResultadoPago:
+        self.logs.append(f"INICIO: Cobro de S/ {monto:.2f} a {celular}")
+        resultado = self._interna.cobrar(monto, celular)
+        self.logs.append(f"FIN: Cobro {'APROBADO' if resultado.aprobado else 'RECHAZADO'}")
+        return resultado
+
+
 # ============================================================================
 # FACTORY: Registro dinámico de pasarelas (abierto a extensión, sin Singleton)
 # ============================================================================
