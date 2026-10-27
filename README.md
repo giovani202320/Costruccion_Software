@@ -90,6 +90,8 @@ flowchart TB
 - [ADR-001: Adoptar un monolito modular para el MVP de San Camilo en Línea](docs/architecture/adr/001-estilo-arquitectonico.md)
 - [ADR-002: Persistencia centralizada en PostgreSQL con esquemas aislados por módulo](docs/architecture/adr/002-estrategia-persistencia.md)
 - [ADR-003: Integración de pagos con Yape y notificaciones por WhatsApp mediante Puertos y Adaptadores](docs/architecture/adr/003-estrategia-notificaciones-y-pagos.md)
+- [ADR-005: Patrones de Diseño GoF adoptados y rechazados en la refactorización de Pedidos](docs/architecture/adr/005-patrones-adoptados-y-rechazados.md)
+
 
 ---
 
@@ -142,7 +144,6 @@ stateDiagram-v2
 - **Bitácora de Uso de IA (E7):** [bitacora-ia.md](docs/design/bitacora-ia.md)
 
 ---
-
 ## Arquitectura C4 (Lab 06)
 
 El modelo C4 se mantiene como arquitectura como código en [`docs/architecture/c4/workspace.dsl`](docs/architecture/c4/workspace.dsl). El inventario, las exportaciones y la revisión están en [`docs/architecture/c4/`](docs/architecture/c4/).
@@ -174,6 +175,50 @@ graph LR
 | Componentes de API | [PlantUML](docs/architecture/c4/export/structurizr-componentApi.puml) | [PNG](docs/architecture/c4/img/structurizr-componentApi.png) |
 | Dinámica: confirmar con Yape | [PlantUML](docs/architecture/c4/export/structurizr-confirmarYape.puml) | [PNG](docs/architecture/c4/img/structurizr-confirmarYape.png) |
 | Despliegue: Producción | [PlantUML](docs/architecture/c4/export/structurizr-deploymentProduccion.puml) | [PNG](docs/architecture/c4/img/structurizr-deploymentProduccion.png) |
+
+## Reflexión sobre el uso de la IA (5 a 8 líneas)
+
+El asistente de IA demostró ser una herramienta de gran valor para acelerar la redacción formal de escenarios de calidad y estructurar la sintaxis de diagramas en Mermaid, PlantUML y Python Diagrams. Sin embargo, presentó sesgos notorios hacia la sobre-ingeniería inicial (sugiriendo microservicios con Kubernetes y brokers pesados) y alucinó capacidades inexistentes, como afirmar que Yape dispone de una API pública gratuita para pequeños comerciantes. La lección fundamental para el equipo fue que la IA propone con rapidez pero carece de criterio sobre las restricciones del mundo real; por tanto, el juicio crítico humano y la validación técnica contra costos reales, plazos estrictos y el contexto operativo del usuario final son insustituibles en la ingeniería de software.
+## Patrones de diseño (Lab 07)
+
+Refactorización orientada a patrones GoF sobre el flujo central de pedidos y pagos (`src/pedidos/servicio.py`), guiada por métricas objetivas de complejidad ciclomática (`radon`) y una red de seguridad de 44 pruebas automatizadas (`pytest`).
+
+### 1. Mapeo: Olor de código → Patrón GoF → Prueba automatizada
+
+| Olor de código (Code Smell) | Patrón GoF aplicado | Prueba automatizada en `tests/` | Entregable / Código |
+|:---|:---|:---|:---|
+| **Condicionales por medio de pago** (`if/elif` con Yape/Plin) y acoplamiento a SDKs heterogéneos | **Strategy** + **Adapter** + **Factory Method con registro** | `test_open_closed_nuevo_medio_sin_modificar_el_servicio`<br>`test_adapter_aisla_sdk_yape`<br>`test_adapter_aisla_client_plin` | **E2:** [`pagos.py`](src/pedidos/pagos.py) · [`pagos.puml`](docs/design/patrones/pagos.puml) |
+| **Bucles de reintento duplicados** (`for intento in range(3)`) mezclados en el flujo de negocio | **Decorator** (`ConReintentos`, `ConLogTransacciones`) | `test_decorator_reintentos_solo_en_timeout_no_en_rechazo`<br>`test_decorator_composicion_reintentos_y_log` | **E2:** [`pagos.py`](src/pedidos/pagos.py) |
+| **Mutaciones y condicionales anidados sobre strings de estado** (`pedido.estado`), propensos a estados inconsistentes | **State** (`EstadoPedido`, `Borrador`, `Confirmado`, `Pagado`, `Cancelado`) | `test_state_impide_transiciones_invalidas`<br>`test_state_transiciones_validas_ciclo_completo`<br>`test_state_cancelacion_desde_borrador_y_confirmado` | **E3:** [`estados.py`](src/pedidos/estados.py) · [`estados.puml`](docs/design/patrones/estados.puml) |
+| **Notificaciones y auditoría acopladas manualmente** (`eventos.append(...)`) en el flujo transaccional | **Observer** (`PublicadorEventos`, `Suscriptor`, `NotificadorWhatsApp`) | `test_observer_notifica_a_multiples_suscriptores`<br>`test_observer_nuevo_suscriptor_sin_tocar_el_servicio`<br>`test_observer_desuscribir` | **E4:** [`eventos.py`](src/pedidos/eventos.py) |
+| **Acoplamiento a API externa de LLM y alucinaciones de precios** sin moderación determinista | **Strategy** + **Adapter** + **Decorator** + **Chain of Responsibility** | `test_ia_mock_adapter_normaliza_correctamente`<br>`test_ia_decorator_con_cache_evita_llamadas_repetidas`<br>`test_ia_guardrail_sin_precios_bloquea_precio_inventado` | **E5:** [`ia.py`](src/pedidos/ia.py) · [`ia.puml`](docs/design/patrones/ia.puml) |
+
+### 2. Tabla Comparativa de Métricas (Radon 6.0.1)
+
+| Métrica / Elemento | Versión Inicial (`antes`) | Versión con Patrones (`después`) | Variación / Impacto |
+|:---|:---:|:---:|:---|
+| **Complejidad ciclomática de `confirmar_y_pagar`** | **15 (Rango C)** | **2 (Rango A)** | **−86.7%** (Flujo lineal y simple) |
+| **Complejidad promedio del código** | **5.50 (Rango B)** | **1.84 (Rango A)** | **−66.5%** (Alta simplificación por delegación) |
+| **Complejidad máxima del módulo** | 15 (`confirmar_y_pagar`) | 5 (`SinPrecios._aplicar` / `__init__`) | Ningún método supera el umbral crítico de 10 |
+| **SLOC del orquestador (`servicio.py`)** | 85 SLOC | 42 SLOC | **−50.6%** (El servicio se redujo a la mitad) |
+| **Líneas totales de dominio (SLOC)** | 85 SLOC | 314 SLOC (5 módulos modulares) | +269.4% (Costo de interfaces y abstracciones) |
+| **Índice de Mantenibilidad (MI)** | 52.75 (Rango A) | **81.46 (Rango A)** | **+28.71 puntos** en el servicio de aplicación |
+| **Archivos a modificar para nuevo medio de pago** | 1 (`servicio.py`) | **0** (solo registrar en `FabricaPasarelas`) | Cumplimiento estricto de **OCP** |
+| **Cobertura de pruebas automatizadas** | 26 pruebas | 44 pruebas (100% pasando, 1 xfail documentado) | Red de seguridad completa |
+
+### 3. Índice de Entregables de Patrones (Lab 07)
+
+- **E1: Detección de Olores de Código y Métricas:** [olores.md](docs/design/patrones/olores.md)
+- **E2: Patrones Creacionales y Estructurales de Pagos (Strategy, Adapter, Decorator, Factory):** [pagos.py](src/pedidos/pagos.py) · [pagos.puml](docs/design/patrones/pagos.puml)
+- **E3: Ciclo de Vida del Pedido (State):** [estados.py](src/pedidos/estados.py) · [estados.puml](docs/design/patrones/estados.puml)
+- **E4: Desacoplamiento de Notificaciones (Observer):** [eventos.py](src/pedidos/eventos.py)
+- **E5: Aislamiento de IA y Guardrails (Chain of Responsibility, Adapter, Cache):** [ia.py](src/pedidos/ia.py) · [ia.puml](docs/design/patrones/ia.puml)
+- **E6: Métricas y Análisis de Trade-Off:** [metricas.md](docs/design/patrones/metricas.md)
+- **E7: Bitácora de Uso de IA:** [bitacora-ia.md](docs/design/patrones/bitacora-ia.md)
+- **E8: Decisión Arquitectónica ADR-005:** [ADR-005](docs/architecture/adr/005-patrones-adoptados-y-rechazados.md)
+
+---
+
 
 ## Reflexión sobre el uso de la IA (5 a 8 líneas)
 
