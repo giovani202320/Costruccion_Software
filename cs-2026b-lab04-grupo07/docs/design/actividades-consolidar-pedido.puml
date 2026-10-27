@@ -1,3 +1,4 @@
+plantuml @startuml skinparam ActivityBackgroundColor #FEFECE skinparam ActivityBorderColor #A80036 skinparam DefaultFontColor #000000 
 @startuml actividades-consolidar-pedido
 skinparam shadowing false
 skinparam defaultFontName Arial
@@ -52,3 +53,4 @@ else (no)
 endif
 
 @enduml
+@endum
