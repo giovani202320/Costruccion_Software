@@ -1,0 +1,90 @@
+@startuml ia
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+
+title IA Aislada: Strategy + Adapter + Decorator + Chain of Responsibility\n(San Camilo en Línea)
+
+class NormalizadorProductos <<Cliente>> {
+    - proveedor: ProveedorLLM
+    - guardrails: Guardrail
+    + normalizar(nombre_crudo: str): str
+    + {static} _cadena_por_defecto(): Guardrail
+}
+
+interface ProveedorLLM <<Strategy>> {
+    {abstract} + completar(prompt: str): str
+}
+
+class MockLLMAdapter <<Adapter>> {
+    + respuestas: dict
+    + respuesta_defecto: Optional[str]
+    + llamadas: int
+    + historial_prompts: List[str]
+    + completar(prompt: str): str
+}
+
+class ConCache <<Decorator>> {
+    - _interno: ProveedorLLM
+    - _cache: dict
+    + llamadas_cache: int <<property>>
+    + completar(prompt: str): str
+}
+
+abstract class Guardrail <<Handler>> {
+    - _siguiente: Optional[Guardrail]
+    + enlazar(siguiente: Guardrail): Guardrail
+    + validar(texto: str): str
+    {abstract} # _aplicar(texto: str): str
+}
+
+class SinPrecios <<ConcreteHandler>> {
+    # _aplicar(texto: str): str
+}
+
+class SinAfirmacionesProhibidas <<ConcreteHandler>> {
+    + PROHIBIDAS: List[str]
+    # _aplicar(texto: str): str
+}
+
+class LongitudMaxima <<ConcreteHandler>> {
+    + max_caracteres: int
+    # _aplicar(texto: str): str
+}
+
+' Relaciones
+NormalizadorProductos o-down-> ProveedorLLM : "usa estrategia"
+NormalizadorProductos o-right-> Guardrail : "valida con cadena"
+
+ProveedorLLM <|.. MockLLMAdapter : "implementa"
+ProveedorLLM <|.. ConCache : "implementa"
+
+ConCache o--> ProveedorLLM : "_interno (envuelve)"
+
+Guardrail <|-- SinPrecios
+Guardrail <|-- SinAfirmacionesProhibidas
+Guardrail <|-- LongitudMaxima
+
+Guardrail o--> Guardrail : "_siguiente (cadena)"
+
+note bottom of MockLLMAdapter
+    <b>ADAPTER (Doble de Prueba):</b>
+    Simula completitudes deterministas
+    en memoria para 'papa amarila' -> 'Papa Amarilla'
+    sin requerir claves de API ni red ($0 costo).
+end note
+
+note bottom of ConCache
+    <b>DECORATOR de Caché:</b>
+    Evita invocar al LLM ante prompts
+    duplicados, reduciendo latencia y costos.
+end note
+
+note bottom of Guardrail
+    <b>CHAIN OF RESPONSIBILITY:</b>
+    Trata la salida del LLM como dato NO confiable:
+    SinPrecios -> SinAfirmaciones -> LongitudMaxima.
+    Si un eslabón falla, lanza ValueError de inmediato.
+end note
+
+@enduml

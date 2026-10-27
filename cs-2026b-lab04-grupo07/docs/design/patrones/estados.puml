@@ -1,0 +1,76 @@
+@startuml estados
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+
+title Ciclo de Vida del Pedido: Patrón State\n(San Camilo en Línea)
+
+class Pedido <<Context>> {
+    + id: int
+    + celular: str
+    + lineas: List[Linea]
+    + operacion: Optional[str]
+    - _estado: EstadoPedido
+    + estado: str <<property>>
+    + cambiar_a(nuevo_estado: EstadoPedido): void
+    + confirmar(): void
+    + pagar(operacion: str): void
+    + cancelar(motivo: str): void
+    + total(): float
+}
+
+abstract class EstadoPedido <<State>> {
+    + nombre: str
+    + confirmar(pedido: Pedido): void
+    + pagar(pedido: Pedido, operacion: str): void
+    + cancelar(pedido: Pedido, motivo: str): void
+}
+
+class Borrador <<ConcreteState>> {
+    + nombre = "BORRADOR"
+    + confirmar(pedido: Pedido): void
+    + cancelar(pedido: Pedido, motivo: str): void
+}
+
+class Confirmado <<ConcreteState>> {
+    + nombre = "CONFIRMADO"
+    + pagar(pedido: Pedido, operacion: str): void
+    + cancelar(pedido: Pedido, motivo: str): void
+}
+
+class Pagado <<ConcreteState>> {
+    + nombre = "PAGADO"
+    + confirmar(pedido: Pedido): void <<lanza ValueError>>
+    + pagar(pedido: Pedido, operacion: str): void <<lanza ValueError>>
+    + cancelar(pedido: Pedido, motivo: str): void <<lanza ValueError>>
+}
+
+class Cancelado <<ConcreteState>> {
+    + nombre = "CANCELADO"
+    + confirmar(pedido: Pedido): void <<lanza ValueError>>
+    + pagar(pedido: Pedido, operacion: str): void <<lanza ValueError>>
+    + cancelar(pedido: Pedido, motivo: str): void <<lanza ValueError>>
+}
+
+' Relaciones
+Pedido o-right-> EstadoPedido : "_estado (delega)"
+
+EstadoPedido <|-- Borrador
+EstadoPedido <|-- Confirmado
+EstadoPedido <|-- Pagado
+EstadoPedido <|-- Cancelado
+
+Borrador ..> Confirmado : "transición confirmar()"
+Borrador ..> Cancelado : "transición cancelar()"
+Confirmado ..> Pagado : "transición pagar()"
+Confirmado ..> Cancelado : "transición cancelar()"
+
+note top of EstadoPedido
+    <b>Regla por construcción:</b>
+    La clase abstracta base prohíbe todas
+    las transiciones por defecto (ValueError).
+    Cada estado concreto redefine únicamente
+    las transiciones válidas según Lab 05.
+end note
+
+@enduml

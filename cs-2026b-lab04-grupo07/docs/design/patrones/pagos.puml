@@ -1,0 +1,98 @@
+@startuml pagos
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+
+title Pagos: Strategy + Adapter + Decorator + Factory\n(San Camilo en Línea)
+
+class ServicioPedidos <<cliente>> {
+    - yape: YapeSDK
+    - plin: PlinClient
+    - fabrica: FabricaPasarelas
+    - publicador: PublicadorEventos
+    + confirmar_y_pagar(pedido: Pedido, medio: str): str
+}
+
+class FabricaPasarelas <<Factory>> {
+    - _creadores: dict
+    + registrar(medio: str, creador: Callable): void
+    + crear(medio: str): PasarelaPago
+}
+
+interface PasarelaPago <<Strategy>> {
+    {abstract} + cobrar(monto: float, celular: str): ResultadoPago
+}
+
+class ResultadoPago <<ValueObject>> {
+    + aprobado: bool
+    + operacion: Optional[str]
+}
+
+class YapeAdapter <<Adapter>> {
+    - _sdk: YapeSDK
+    + cobrar(monto: float, celular: str): ResultadoPago
+}
+
+class PlinAdapter <<Adapter>> {
+    - _cliente: PlinClient
+    + cobrar(monto: float, celular: str): ResultadoPago
+}
+
+class ConReintentos <<Decorator>> {
+    - _interna: PasarelaPago
+    - _intentos: int
+    + cobrar(monto: float, celular: str): ResultadoPago
+}
+
+class ConLogTransacciones <<Decorator>> {
+    - _interna: PasarelaPago
+    + logs: List[str]
+    + cobrar(monto: float, celular: str): ResultadoPago
+}
+
+class YapeSDK <<externo>> {
+    + fallas: int
+    + llamadas: int
+    + realizar_cobro(celular: str, monto: float): dict
+}
+
+class PlinClient <<externo>> {
+    + fallas: int
+    + llamadas: int
+    + charge(amount_cents: int, phone: str): tuple
+}
+
+' Relaciones
+ServicioPedidos .right.> FabricaPasarelas : "pide estrategia"
+ServicioPedidos .down.> PasarelaPago : "usa"
+
+FabricaPasarelas ..> PasarelaPago : "crea"
+FabricaPasarelas .down.> ConReintentos : "envuelve con"
+
+PasarelaPago <|.. YapeAdapter : "implementa"
+PasarelaPago <|.. PlinAdapter : "implementa"
+PasarelaPago <|.. ConReintentos : "implementa"
+PasarelaPago <|.. ConLogTransacciones : "implementa"
+
+ConReintentos o--> PasarelaPago : "_interna (envuelve)"
+ConLogTransacciones o--> PasarelaPago : "_interna (envuelve)"
+
+YapeAdapter --> YapeSDK : "_sdk (traduce)"
+PlinAdapter --> PlinClient : "_cliente (traduce)"
+
+PasarelaPago ..> ResultadoPago : "retorna"
+
+note right of ConReintentos
+    <b>DECORATOR de Resiliencia:</b>
+    Reintenta hasta 3 veces solo ante
+    TimeoutError. No reintenta rechazos
+    de negocio (evita cobros duplicados).
+end note
+
+note bottom of FabricaPasarelas
+    <b>FACTORY de Registro (OCP):</b>
+    Nuevos medios de pago (ej. TUNKI) se
+    registran sin alterar ServicioPedidos.
+end note
+
+@enduml
