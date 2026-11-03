@@ -6,3 +6,16 @@ __pycache__/
 .coverage
 htmlcov/
 .env
+.import_linter_cache/
+
+# Informes y utilitarios de documentación (no se suben al repositorio)
+INFORME_*
+Informe_*
+*.docx
+*.pdf
+generar_informe*.py
+~$*
+
+# Diagramas temporales
+classes_pedidos.puml
+packages_pedidos.puml

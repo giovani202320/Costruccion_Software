@@ -1,0 +1,20 @@
+[importlinter]
+root_package = pedidos
+
+[importlinter:contract:capas]
+name = FF-01 Capas del monolito modular sin ciclos (ADR-001)
+type = layers
+layers =
+    pedidos.servicio
+    pedidos.eventos | pedidos.ia | pedidos.pagos
+    pedidos.estados
+    pedidos.dominio
+
+[importlinter:contract:puertos]
+name = FF-02 El dominio no conoce las SDKs externas (ADR-005)
+type = forbidden
+source_modules =
+    pedidos.dominio
+    pedidos.estados
+forbidden_modules =
+    pedidos.externos

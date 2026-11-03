@@ -1,0 +1,58 @@
+digraph ArbolUtilidad {
+    rankdir=LR;
+    bgcolor="white";
+    node [fontname="Helvetica,Arial,sans-serif", fontsize=10, style="filled,rounded", shape=box];
+    edge [fontname="Helvetica,Arial,sans-serif", fontsize=9, color="#555555"];
+
+    // Raíz
+    root [label="Utilidad\nSan Camilo en Línea 2.0\n(San Camilo + Altiplano + Río Seco)", fillcolor="#1E3A8A", fontcolor="white", shape=ellipse, style="filled", width=2.4, height=1.1];
+
+    // Nivel 1: Atributos de calidad
+    mod [label="Modificabilidad\n(Atributo Crítico)", fillcolor="#C2410C", fontcolor="white", width=2.0];
+    seg [label="Seguridad / Aislamiento\n(Atributo Crítico)", fillcolor="#B91C1C", fontcolor="white", width=2.0];
+    rend [label="Rendimiento", fillcolor="#EA580C", fontcolor="white", width=2.0];
+    disp [label="Disponibilidad", fillcolor="#DC2626", fontcolor="white", width=2.0];
+
+    root -> mod;
+    root -> seg;
+    root -> rend;
+    root -> disp;
+
+    // Nivel 2: Refinamientos
+    ref_reglas [label="Reglas de negocio\npor mercado", fillcolor="#FFEDD5", fontcolor="#7C2D12"];
+    ref_mercado [label="Incorporación de\nnuevo mercado", fillcolor="#FFEDD5", fontcolor="#7C2D12"];
+    mod -> ref_reglas;
+    mod -> ref_mercado;
+
+    ref_aisla [label="Aislamiento entre\nmercados y puestos", fillcolor="#FEE2E2", fontcolor="#7F1D1D"];
+    ref_datos [label="Protección de datos\npersonales (Ley 29733)", fillcolor="#FEE2E2", fontcolor="#7F1D1D"];
+    seg -> ref_aisla;
+    seg -> ref_datos;
+
+    ref_cat [label="Latencia de catálogo\nen hora punta", fillcolor="#FFEDD5", fontcolor="#7C2D12"];
+    rend -> ref_cat;
+
+    ref_pagos [label="Resiliencia ante caídas\nde pasarela externa", fillcolor="#FEE2E2", fontcolor="#7F1D1D"];
+    ref_offline [label="Conectividad intermitente\nen puestos", fillcolor="#FEE2E2", fontcolor="#7F1D1D"];
+    disp -> ref_pagos;
+    disp -> ref_offline;
+
+    // Nivel 3: Hojas (Escenarios calificados)
+    qa01 [label="(H,H) QA-01: Administrador configura nueva regla de mercado (comisión/horario) ->\naplicada en BD sin redeploy en <= 5 min y 0 s de inactividad", fillcolor="#F8FAFC", fontcolor="#0F172A", shape=box];
+    qa02 [label="(M,M) QA-02: Incorporación de 4to mercado -> provisionado y operativo\nmediante scripts de configuración en <= 1 día-persona", fillcolor="#F8FAFC", fontcolor="#0F172A", shape=box];
+    ref_reglas -> qa01;
+    ref_mercado -> qa02;
+
+    qa03 [label="(H,H) QA-03: Comerciante autenticado de Río Seco intenta acceder a pedidos de San Camilo ->\nPostgreSQL RLS y JWT claim mercado_id retornan HTTP 403 y 0 registros ajenos", fillcolor="#F8FAFC", fontcolor="#0F172A", shape=box];
+    qa04 [label="(M,L) QA-04: Transacciones y números telefónicos protegidos en tránsito (TLS 1.3)\ny en reposo (AES-256) -> 0 registros expuestos en texto plano", fillcolor="#F8FAFC", fontcolor="#0F172A", shape=box];
+    ref_aisla -> qa03;
+    ref_datos -> qa04;
+
+    qa05 [label="(H,M) QA-05: 800 compradores concurrentes consultan catálogos multi-mercado en hora pico ->\np95 del catálogo <= 1.8 s con tasa de error < 0.1%", fillcolor="#F8FAFC", fontcolor="#0F172A", shape=box];
+    ref_cat -> qa05;
+
+    qa06 [label="(H,M) QA-06: Caída total de pasarela de pago durante 20 min -> Circuit Breaker commuta\na tabla outbox con 0 pedidos perdidos y confirmación en <= 2.0 s", fillcolor="#F8FAFC", fontcolor="#0F172A", shape=box];
+    qa07 [label="(M,M) QA-07: Comerciante sin señal 3G/4G actualiza stock en PWA -> guardado en IndexedDB\ny sincronizado en <= 10 s al recuperar señal con 0 pérdidas", fillcolor="#F8FAFC", fontcolor="#0F172A", shape=box];
+    ref_pagos -> qa06;
+    ref_offline -> qa07;
+}
