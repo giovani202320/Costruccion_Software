@@ -3,6 +3,7 @@ skinparam shadowing false
 skinparam defaultFontName Arial
 skinparam ActivityBackgroundColor #EEF2F8
 skinparam ActivityBorderColor #1A3A5C
+skinparam DefaultFontColor #000000
 
 |Cliente|
 start
@@ -37,14 +38,17 @@ if (¿Stock disponible en todos los puestos?) then (sí)
         :Confirma la recepción final del pedido;
         stop
     else (no)
+
         |Sistema|
         :Libera el stock temporalmente reservado;
         :Marca el pedido consolidado como CANCELADO;
+
         |Cliente|
         :Recibe notificación de pago rechazado;
         stop
     endif
 else (no)
+
     |Cliente|
     :Recibe alerta de productos no disponibles;
     :Ajusta cantidades o cambia de puesto;
@@ -52,3 +56,4 @@ else (no)
 endif
 
 @enduml
+
