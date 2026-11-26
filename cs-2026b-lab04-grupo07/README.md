@@ -1,8 +1,9 @@
 # San Camilo en Línea 2.0 — Plataforma Multi-Mercado
 
 [![fitness-functions](https://github.com/giovani202320/Costruccion_Software/actions/workflows/fitness.yml/badge.svg)](https://github.com/giovani202320/Costruccion_Software/actions/workflows/fitness.yml)
+[![prompt-evals](https://github.com/giovani202320/Costruccion_Software/actions/workflows/prompts.yml/badge.svg)](https://github.com/giovani202320/Costruccion_Software/actions/workflows/prompts.yml)
 ![Python](https://img.shields.io/badge/Python-3.12-blue.svg)
-![Status](https://img.shields.io/badge/Release-v0.8--arquitectura-success.svg)
+![Status](https://img.shields.io/badge/Release-v0.9--prompts-success.svg)
 
 Repositorio oficial del proyecto **San Camilo en Línea (Caso 7)** para la asignatura de **Construcción de Software** (EPIS-UNSA, 2026-B).
 
@@ -117,25 +118,39 @@ Evaluación automatizada con **promptfoo** y validación mediante **JSON Schema*
 
 \*Calibración en `B5_resiste_inyeccion`: inicialmente `not-icontains` falló `N8` porque `"texto_original"` repetía el payload de entrada (`"APROBADO"`, `"Oro Puro 24K"`); se acotó la verificación a los campos generados (`producto_catalogo` y `motivo`), corrigiendo el falso positivo.
 
+### Resultados gráficos, seguridad e integración (E5–E8)
+
+![Resultados de evaluación Lab 09](prompts/resultados_lab09.png)
+
+- **Red Teaming y defensa en 4 capas (E5):** [`prompts/seguridad/red-team.md`](prompts/seguridad/red-team.md) (5 vectores OWASP LLM01; hallazgo real de *delimiter escape* en `ATK-2` con `</entrada>`).
+- **Integración segura detrás de `ProveedorLLM` (E6):** [`src/pedidos/generador_criterios.py`](src/pedidos/generador_criterios.py), [`src/pedidos/generador_normalizacion.py`](src/pedidos/generador_normalizacion.py) y pruebas [`tests/test_generadores_prompts.py`](tests/test_generadores_prompts.py).
+- **Integración Continua, Bitácora IA y No Determinismo (E7):** [`.github/workflows/prompts.yml`](.github/workflows/prompts.yml), [`prompts/verificar_evals.py`](prompts/verificar_evals.py) y [`prompts/bitacora-ia.md`](prompts/bitacora-ia.md) (10 interacciones documentadas).
+
+**Lecciones aprendidas:**
+1. **El evaluador también se evalúa:** dos aserciones (`A3` con `'react'` en `"reactivar"` y `B5` escaneando `texto_original`) produjeron falsos positivos reales antes de ser calibradas.
+2. **Defensa en capas obligatoria:** en `ATK-2`, el cierre falso `</entrada>` rompió el delimitador XML, demostrando que la sanitización en código (`<`/`>`) y la validación JSON Schema (Capa 3) son indispensables.
+3. **No determinismo acotado por contrato:** al repetir `N1`, `N6` y `N8`, cambiaron la serialización JSON y la redacción de `motivo`, pero los campos con `enum` cerrado (`producto_catalogo`, `confianza`) se mantuvieron 100% estables.
+4. **Control de regresiones:** endurecer `v3` llevó `A1`/`A3`/`A4`/`A5` al 100% y bajó de 87 a 21 escenarios, pero reveló una regresión explicada en `H6` por sobre-rigidez del filtro INVEST.
+
 ---
 
 ## Ejecución Local y Verificación
 
 ```powershell
 # 1. Instalar dependencias
-pip install pytest import-linter matplotlib
+pip install pytest import-linter matplotlib jsonschema pyyaml
 
 # 2. Ejecutar fitness functions estructurales
 $env:PYTHONPATH="src"
 lint-imports
 
-# 3. Ejecutar fitness functions de calidad
+# 3. Ejecutar suite completa (patrones, fitness functions e integración de prompts)
 $env:PYTHONPATH="src;."
-pytest -v tests/test_fitness.py
+pytest -v
 
-# 4. Ejecutar simulaciones y regenerar gráficos
-python fitness/rendimiento.py
-python fitness/disponibilidad.py
-python fitness/multitenencia_reglas.py
-python fitness/matriz_riesgos.py
+# 4. Evaluar prompts con promptfoo y verificar compuertas (>= 85% y 0 errores)
+npx --yes promptfoo eval --no-cache -c prompts/criterios/promptfooconfig.yaml -o resultados-criterios.json
+npx --yes promptfoo eval --no-cache -c prompts/normalizacion/promptfooconfig.yaml -o resultados-normalizacion.json
+python prompts/verificar_evals.py resultados-criterios.json resultados-normalizacion.json
+python prompts/generar_grafico.py
 ```
