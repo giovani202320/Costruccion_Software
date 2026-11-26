@@ -1,0 +1,57 @@
+name: prompt-evals
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master, feat/lab09-prompts ]
+  workflow_dispatch:
+
+jobs:
+  evaluar-prompts:
+    runs-on: ubuntu-latest
+    env:
+      PROMPTFOO_DISABLE_TELEMETRY: "1"
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Configurar Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar dependencias Python
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema pytest pyyaml
+
+      - name: Evaluar Tarea A (criterios v1-v3 con proveedor grabado)
+        run: |
+          npx --yes promptfoo@0.126.0 eval --no-cache -c prompts/criterios/promptfooconfig.yaml -o resultados-criterios.json || true
+
+      - name: Evaluar Tarea B (normalizacion v1-v2 con proveedor grabado)
+        run: |
+          npx --yes promptfoo@0.126.0 eval --no-cache -c prompts/normalizacion/promptfooconfig.yaml -o resultados-normalizacion.json || true
+
+      - name: Verificar compuertas de calidad (>= 85% y 0 errores)
+        run: |
+          python prompts/verificar_evals.py resultados-criterios.json resultados-normalizacion.json
+
+      - name: Ejecutar pruebas de integración de generadores (E6)
+        run: |
+          export PYTHONPATH="src:."
+          pytest -v tests/test_generadores_prompts.py
+
+      - name: Publicar reportes JSON de promptfoo
+        uses: actions/upload-artifact@v4
+        with:
+          name: promptfoo-resultados
+          path: |
+            resultados-criterios.json
+            resultados-normalizacion.json
