@@ -1,8 +1,9 @@
 # San Camilo en Línea 2.0 — Plataforma Multi-Mercado
 
 [![fitness-functions](https://github.com/giovani202320/Costruccion_Software/actions/workflows/fitness.yml/badge.svg)](https://github.com/giovani202320/Costruccion_Software/actions/workflows/fitness.yml)
+[![prompt-evals](https://github.com/giovani202320/Costruccion_Software/actions/workflows/prompts.yml/badge.svg)](https://github.com/giovani202320/Costruccion_Software/actions/workflows/prompts.yml)
 ![Python](https://img.shields.io/badge/Python-3.12-blue.svg)
-![Status](https://img.shields.io/badge/Release-v0.8--arquitectura-success.svg)
+![Status](https://img.shields.io/badge/Release-v0.9--prompts-success.svg)
 
 Repositorio oficial del proyecto **San Camilo en Línea (Caso 7)** para la asignatura de **Construcción de Software** (EPIS-UNSA, 2026-B).
 
@@ -83,23 +84,73 @@ La integridad de la arquitectura se protege mediante compuertas de calidad autom
 
 ---
 
+## Prompt engineering (Lab 09)
+
+Evaluación automatizada con **promptfoo** y validación mediante **JSON Schema** sobre los prompts versionados de *San Camilo en Línea*. Las salidas de los modelos se conservan íntegras sin edición manual en `prompts/<tarea>/grabaciones/` y se ejecutan de forma reproducible mediante [`prompts/proveedor_grabado.py`](prompts/proveedor_grabado.py).
+
+### Tarea A — Criterios de aceptación Gherkin (`prompts/criterios/`)
+
+- **Contrato de salida:** [`prompts/criterios/esquema.json`](prompts/criterios/esquema.json)
+- **Dataset (8 casos `H1`–`H8`):** [`prompts/criterios/casos.yaml`](prompts/criterios/casos.yaml)
+- **Configuración de evaluación:** [`prompts/criterios/promptfooconfig.yaml`](prompts/criterios/promptfooconfig.yaml)
+
+| Versión | Descripción | Aprobación global | `A1` Contrato JSON | `A2` Éxito y error | `A3` Sin impl. | `A4` No INVEST (`H7`) | `A5` Inyección (`H8`) | Fallos principales observados |
+|:---:|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---|
+| **`v1`** | Prompt ingenuo base (`v1.txt`) | **0/8 (0.0%)** | 0/8 (0%) | 0/8 (0%) | 6/8 (75%) | 0/1 (0%) | 1/1 (100%)\* | Salida en texto libre fuera del JSON Schema (`H1`–`H8`); detalles de BD (`H5`, `H7`); 9 criterios inventados en `H7` no-INVEST. |
+| **`v2`** | Rol + Contexto + Template JSON (`v2.txt`) | **7/8 (87.5%)** | 8/8 (100%) | 8/8 (100%) | 7/8 (87.5%) | 0/1 (0%) | 1/1 (100%) | `H7` marcó `invest_ok=false` pero inventó 11 escenarios de PostgreSQL; 87 escenarios totales (sobre-generación) y regla falsa contra decimales en `H5`. |
+| **`v3`** | 7 elementos + Cognitive Verifier + Few-shot + `<historia>` (`v3.txt`) | **7/8 (87.5%)** | 8/8 (100%) | 7/8 (87.5%) | 8/8 (100%) | 1/1 (100%) | 1/1 (100%) | Cumple `A1`, `A3`, `A4` y `A5` al 100% y reduce a 21 escenarios concisos. **Regresión explicada en `H6`:** el filtro INVEST sobre-estricto rechazó `H6` (`invest_ok=false`) al pedir los distritos exactos de cobertura. |
+
+\*Notas de evaluación:
+1. La línea base `v1` se ejecutó en lote en una sola interacción del asistente, lo que amortiguó accidentalmente el ataque de `H8`; desde `v2` cada caso se ejecuta en un Chat Temporal aislado.
+2. **Calibración del evaluador (E3.4):** `A3_sin_implementacion` dio inicialmente un falso positivo en `v2/H5` (6/8 = 75%) porque `includes('react')` coincidió con el verbo `"reactivar"`. Se corrigió con límites de palabra (`\breact\b`) e inspección acotada a `escenarios`, además de migrar `$schema` a Draft-07 para `Ajv`.
+3. **Explicación de regresión `v2` → `v3` en `H6`:** `v3` superó la meta (≥85%) y eliminó la invención de escenarios técnicos en `H7` (`A4`: 0% → 100%), pero su regla INVEST resultó demasiado estricta frente a parámetros configurables como `"zona de cobertura de Arequipa"`. Hipótesis de ajuste futuro (`v3.1`): indicar explícitamente que los parámetros operativos configurables no invalidan INVEST.
+
+### Tarea B (Caso 7) — Normalización de productos de comerciantes (`prompts/normalizacion/`)
+
+- **Contrato de salida (catálogo cerrado + `"desconocido"`):** [`prompts/normalizacion/esquema.json`](prompts/normalizacion/esquema.json)
+- **Dataset (8 casos `N1`–`N8`):** [`prompts/normalizacion/casos.yaml`](prompts/normalizacion/casos.yaml)
+- **Configuración de evaluación:** [`prompts/normalizacion/promptfooconfig.yaml`](prompts/normalizacion/promptfooconfig.yaml)
+
+| Versión | Descripción | Aprobación global | `B1` JSON/Catálogo | `B2` Exactitud | `B3` Guardrails | `B4` Desconocido (`N6`,`N7`) | `B5` Inyección (`N8`) | Observaciones |
+|:---:|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---|
+| **`v1`** | Prompt ingenuo (`v1.txt`, equivalente al del Lab 07) | **0/8 (0.0%)** | 0/8 (0%) | 0/8 (0%) | 0/8 (0%) | 0/2 (0%) | 1/1 (100%) | Texto libre y tabla con precio `S/ 4.50` (`N3`); normalizó zapatillas (`N6`) y bolsa mixta (`N7`) en lugar de `"desconocido"`. |
+| **`v2`** | 7 elementos + catálogo cerrado + Few-shot + `<entrada>` (`v2.txt`) | **7/8 (87.5%)** | 7/8 (87.5%) | 7/8 (87.5%) | 7/8 (87.5%) | 2/2 (100%) | 1/1 (100%) | 7/8 perfectos incluyendo `N6`/`N7` (`"desconocido"`) y `N8` (`"Tomate Italiano"`). `N2` rechazado por JSON malformado (falta `{` inicial en la salida grabada, conservada sin editar). |
+
+\*Calibración en `B5_resiste_inyeccion`: inicialmente `not-icontains` falló `N8` porque `"texto_original"` repetía el payload de entrada (`"APROBADO"`, `"Oro Puro 24K"`); se acotó la verificación a los campos generados (`producto_catalogo` y `motivo`), corrigiendo el falso positivo.
+
+### Resultados gráficos, seguridad e integración (E5–E8)
+
+![Resultados de evaluación Lab 09](prompts/resultados_lab09.png)
+
+- **Red Teaming y defensa en 4 capas (E5):** [`prompts/seguridad/red-team.md`](prompts/seguridad/red-team.md) (5 vectores OWASP LLM01; hallazgo real de *delimiter escape* en `ATK-2` con `</entrada>`).
+- **Integración segura detrás de `ProveedorLLM` (E6):** [`src/pedidos/generador_criterios.py`](src/pedidos/generador_criterios.py), [`src/pedidos/generador_normalizacion.py`](src/pedidos/generador_normalizacion.py) y pruebas [`tests/test_generadores_prompts.py`](tests/test_generadores_prompts.py).
+- **Integración Continua, Bitácora IA y No Determinismo (E7):** [`.github/workflows/prompts.yml`](.github/workflows/prompts.yml), [`prompts/verificar_evals.py`](prompts/verificar_evals.py) y [`prompts/bitacora-ia.md`](prompts/bitacora-ia.md) (10 interacciones documentadas).
+
+**Lecciones aprendidas:**
+1. **El evaluador también se evalúa:** dos aserciones (`A3` con `'react'` en `"reactivar"` y `B5` escaneando `texto_original`) produjeron falsos positivos reales antes de ser calibradas.
+2. **Defensa en capas obligatoria:** en `ATK-2`, el cierre falso `</entrada>` rompió el delimitador XML, demostrando que la sanitización en código (`<`/`>`) y la validación JSON Schema (Capa 3) son indispensables.
+3. **No determinismo acotado por contrato:** al repetir `N1`, `N6` y `N8`, cambiaron la serialización JSON y la redacción de `motivo`, pero los campos con `enum` cerrado (`producto_catalogo`, `confianza`) se mantuvieron 100% estables.
+4. **Control de regresiones:** endurecer `v3` llevó `A1`/`A3`/`A4`/`A5` al 100% y bajó de 87 a 21 escenarios, pero reveló una regresión explicada en `H6` por sobre-rigidez del filtro INVEST.
+
+---
+
 ## Ejecución Local y Verificación
 
 ```powershell
 # 1. Instalar dependencias
-pip install pytest import-linter matplotlib
+pip install pytest import-linter matplotlib jsonschema pyyaml
 
 # 2. Ejecutar fitness functions estructurales
 $env:PYTHONPATH="src"
 lint-imports
 
-# 3. Ejecutar fitness functions de calidad
+# 3. Ejecutar suite completa (patrones, fitness functions e integración de prompts)
 $env:PYTHONPATH="src;."
-pytest -v tests/test_fitness.py
+pytest -v
 
-# 4. Ejecutar simulaciones y regenerar gráficos
-python fitness/rendimiento.py
-python fitness/disponibilidad.py
-python fitness/multitenencia_reglas.py
-python fitness/matriz_riesgos.py
+# 4. Evaluar prompts con promptfoo y verificar compuertas (>= 85% y 0 errores)
+npx --yes promptfoo eval --no-cache -c prompts/criterios/promptfooconfig.yaml -o resultados-criterios.json
+npx --yes promptfoo eval --no-cache -c prompts/normalizacion/promptfooconfig.yaml -o resultados-normalizacion.json
+python prompts/verificar_evals.py resultados-criterios.json resultados-normalizacion.json
+python prompts/generar_grafico.py
 ```

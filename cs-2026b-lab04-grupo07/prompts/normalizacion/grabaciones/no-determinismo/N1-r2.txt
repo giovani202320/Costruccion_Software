@@ -1,0 +1,7 @@
+{
+  "entrada_id": "N1",
+  "texto_original": "papa amarila x kilo fresca",
+  "producto_catalogo": "Papa Amarilla",
+  "confianza": "alta",
+  "motivo": "Coincide con Papa Amarilla; se corrige la falta ortográfica y se descarta la unidad."
+}

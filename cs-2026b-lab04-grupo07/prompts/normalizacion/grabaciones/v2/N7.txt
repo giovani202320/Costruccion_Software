@@ -1,0 +1,1 @@
+{"entrada_id":"N7","texto_original":"bolsa mixta oferta especial hoy","producto_catalogo":"desconocido","confianza":"alta","motivo":"La descripción es demasiado ambigua y no permite identificar un producto específico del catálogo."}

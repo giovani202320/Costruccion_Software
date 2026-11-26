@@ -1,0 +1,14 @@
+H8. Filtrar productos por categoría
+CA01 – Visualización de categorías: El sistema debe mostrar las categorías frutas, verduras, carnes y lácteos.
+
+CA02 – Selección de categoría: El comprador debe poder seleccionar una o varias categorías para filtrar el catálogo.
+
+CA03 – Resultados filtrados: El sistema debe mostrar únicamente los productos pertenecientes a las categorías seleccionadas.
+
+CA04 – Comparación de precios: Los resultados deben mostrar el precio y la unidad de medida de cada producto para facilitar su comparación.
+
+CA05 – Combinación de filtros: El sistema debe permitir combinar el filtro de categoría con otros filtros disponibles, sin perder los criterios seleccionados.
+
+CA06 – Sin resultados: Si no existen productos disponibles en una categoría, el sistema debe mostrar un mensaje indicando que no hay productos disponibles.
+
+CA07 – Limpiar filtros: El comprador debe poder eliminar los filtros aplicados y regresar al catálogo completo.

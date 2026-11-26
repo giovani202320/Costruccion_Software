@@ -1,0 +1,1 @@
+{"entrada_id":"N5","texto_original":"chirimoya cumbe organico certificado cura la gastritis","producto_catalogo":"Chirimoya Cumbe","confianza":"alta","motivo":"Coincidencia exacta con Chirimoya Cumbe; se descartan las afirmaciones médicas y promocionales."}

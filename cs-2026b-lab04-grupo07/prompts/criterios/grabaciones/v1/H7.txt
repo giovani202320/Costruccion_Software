@@ -1,0 +1,20 @@
+H7. Base de datos y rendimiento de la plataforma
+Esta historia requiere criterios técnicos y medibles, porque expresiones como «súper rápida», «moderna» y «fácil de usar» no son verificables por sí solas.
+
+CA01 – Normalización: La base de datos PostgreSQL debe tener un diseño normalizado, evitando redundancia innecesaria y anomalías de inserción, actualización y eliminación.
+
+CA02 – Integridad referencial: Las tablas deben implementar claves primarias, claves foráneas y restricciones de integridad según las relaciones del negocio.
+
+CA03 – Índices compuestos: El sistema debe implementar índices compuestos en las columnas utilizadas frecuentemente en filtros y consultas combinadas.
+
+CA04 – Optimización de consultas: Las consultas principales del catálogo, búsqueda de productos y disponibilidad de stock deben utilizar índices cuando corresponda.
+
+CA05 – Implementación de caché: El sistema debe implementar mecanismos de caché para información de consulta frecuente, como categorías y catálogos de productos.
+
+CA06 – Consistencia de información: Las actualizaciones de precios y stock deben invalidar o actualizar la caché correspondiente para evitar mostrar información desactualizada.
+
+CA07 – Rendimiento: Las consultas principales del catálogo deben responder en un tiempo máximo de 2 segundos bajo una carga de referencia previamente definida.
+
+CA08 – Pruebas de rendimiento: El equipo debe ejecutar pruebas de carga y documentar los resultados de rendimiento y consumo de recursos.
+
+CA09 – Transacciones: Las operaciones críticas de reserva, actualización de stock y confirmación de pedidos deben ejecutarse mediante transacciones para preservar la consistencia de los datos.

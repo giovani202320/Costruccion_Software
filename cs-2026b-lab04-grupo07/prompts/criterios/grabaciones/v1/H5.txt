@@ -1,0 +1,14 @@
+H5. Actualización de precios y stock por el comerciante
+CA01 – Acceso desde celular: El comerciante debe poder acceder a la administración de sus productos desde un dispositivo móvil.
+
+CA02 – Actualización de precios: El comerciante debe poder modificar el precio diario de sus productos utilizando soles (S/).
+
+CA03 – Actualización de stock: El comerciante debe poder modificar la cantidad disponible de cada producto.
+
+CA04 – Validación de datos: El sistema no debe permitir precios negativos ni cantidades de stock negativas.
+
+CA05 – Agotamiento automático: Cuando el stock de un producto llegue a cero, el sistema debe cambiar automáticamente el estado de la oferta a «Agotada».
+
+CA06 – Reactivación de oferta: Cuando el comerciante registre nuevamente una cantidad de stock mayor que cero, la oferta debe volver a estar disponible.
+
+CA07 – Persistencia: Los cambios realizados deben guardarse en la base de datos y reflejarse en el catálogo de compradores.

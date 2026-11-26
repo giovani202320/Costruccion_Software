@@ -1,0 +1,113 @@
+{
+ "historia_id": "H8",
+ "invest_ok": true,
+ "preguntas": [],
+ "escenarios": [
+ {
+ "titulo": "Filtrar productos por categoría de frutas",
+ "tipo": "exito",
+ "dado": [
+ "El comprador se encuentra en el catálogo de productos del Mercado San Camilo.",
+ "Existen productos registrados en la categoría frutas."
+ ],
+ "cuando": "El comprador selecciona la categoría \"Frutas\" en el filtro.",
+ "entonces": [
+ "El sistema muestra únicamente los productos pertenecientes a la categoría frutas.",
+ "Cada producto muestra su nombre, precio y puesto al que pertenece.",
+ "Los productos de otras categorías no aparecen en los resultados."
+ ]
+ },
+ {
+ "titulo": "Filtrar productos por categoría de verduras",
+ "tipo": "exito",
+ "dado": [
+ "El comprador se encuentra en el catálogo de productos.",
+ "Existen productos registrados en la categoría verduras."
+ ],
+ "cuando": "El comprador selecciona la categoría \"Verduras\".",
+ "entonces": [
+ "El sistema muestra únicamente productos de la categoría verduras.",
+ "Los precios de los productos se muestran para facilitar su comparación."
+ ]
+ },
+ {
+ "titulo": "Filtrar productos por categoría de carnes",
+ "tipo": "exito",
+ "dado": [
+ "El comprador se encuentra en el catálogo de productos.",
+ "Existen productos registrados en la categoría carnes."
+ ],
+ "cuando": "El comprador selecciona la categoría \"Carnes\".",
+ "entonces": [
+ "El sistema muestra únicamente productos de la categoría carnes.",
+ "Se muestran los precios y la información disponible de cada producto."
+ ]
+ },
+ {
+ "titulo": "Filtrar productos por categoría de lácteos",
+ "tipo": "exito",
+ "dado": [
+ "El comprador se encuentra en el catálogo de productos.",
+ "Existen productos registrados en la categoría lácteos."
+ ],
+ "cuando": "El comprador selecciona la categoría \"Lácteos\".",
+ "entonces": [
+ "El sistema muestra únicamente productos de la categoría lácteos.",
+ "Los productos muestran sus respectivos precios para facilitar la comparación."
+ ]
+ },
+ {
+ "titulo": "Mostrar todos los productos al quitar el filtro",
+ "tipo": "exito",
+ "dado": [
+ "El comprador ha seleccionado una categoría en el catálogo.",
+ "El sistema muestra los productos correspondientes a dicha categoría."
+ ],
+ "cuando": "El comprador selecciona la opción \"Todas las categorías\" o limpia el filtro.",
+ "entonces": [
+ "El sistema elimina el filtro aplicado.",
+ "El catálogo vuelve a mostrar productos de todas las categorías disponibles."
+ ]
+ },
+ {
+ "titulo": "Mostrar mensaje cuando una categoría no tiene productos",
+ "tipo": "borde",
+ "dado": [
+ "El comprador se encuentra en el catálogo de productos.",
+ "La categoría seleccionada no tiene productos disponibles registrados."
+ ],
+ "cuando": "El comprador selecciona dicha categoría.",
+ "entonces": [
+ "El sistema muestra un mensaje indicando que no se encontraron productos en esa categoría.",
+ "El sistema no muestra productos pertenecientes a otras categorías.",
+ "El comprador puede cambiar de categoría o limpiar el filtro."
+ ]
+ },
+ {
+ "titulo": "Evitar mostrar productos de otras categorías",
+ "tipo": "error",
+ "dado": [
+ "Existen productos registrados en frutas, verduras, carnes y lácteos."
+ ],
+ "cuando": "El comprador selecciona una categoría específica.",
+ "entonces": [
+ "El sistema muestra exclusivamente productos asociados a la categoría seleccionada.",
+ "El sistema no debe incluir productos de categorías diferentes.",
+ "Los resultados deben corresponder al filtro seleccionado."
+ ]
+ },
+ {
+ "titulo": "Conservar el filtro al consultar los resultados",
+ "tipo": "borde",
+ "dado": [
+ "El comprador ha seleccionado una categoría.",
+ "El sistema muestra los productos filtrados."
+ ],
+ "cuando": "El comprador consulta los resultados o navega entre las páginas del catálogo.",
+ "entonces": [
+ "El sistema conserva la categoría seleccionada.",
+ "Los productos mostrados continúan perteneciendo a la categoría elegida."
+ ]
+ }
+ ]
+}

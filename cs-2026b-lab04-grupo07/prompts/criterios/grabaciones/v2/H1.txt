@@ -1,0 +1,148 @@
+{
+ "historia_id": "H1",
+ "invest_ok": true,
+ "preguntas": [],
+ "escenarios": [
+ {
+ "titulo": "Visualizar correctamente los productos de un puesto",
+ "tipo": "exito",
+ "dado": [
+ "El comprador ha ingresado a San Camilo en Línea.",
+ "Existe un puesto registrado y activo en la plataforma.",
+ "El puesto tiene productos disponibles publicados en su catálogo."
+ ],
+ "cuando": "El comprador selecciona el puesto que desea explorar.",
+ "entonces": [
+ "El sistema muestra el catálogo de productos del puesto seleccionado.",
+ "Cada producto muestra su nombre, imagen, precio y unidad de venta.",
+ "Cada producto muestra su stock actual disponible.",
+ "Los productos pertenecen únicamente al puesto seleccionado."
+ ]
+ },
+ {
+ "titulo": "Mostrar el precio de productos vendidos por unidad",
+ "tipo": "exito",
+ "dado": [
+ "El puesto seleccionado tiene productos cuyo precio está configurado por unidad.",
+ "Los productos tienen un precio válido registrado."
+ ],
+ "cuando": "El comprador visualiza el catálogo del puesto.",
+ "entonces": [
+ "El sistema muestra el precio de cada producto por unidad.",
+ "El precio se presenta en soles (S/).",
+ "El sistema identifica claramente que la unidad de venta es por unidad."
+ ]
+ },
+ {
+ "titulo": "Mostrar el precio de productos vendidos por kilogramo",
+ "tipo": "exito",
+ "dado": [
+ "El puesto seleccionado tiene productos cuyo precio está configurado por kilogramo.",
+ "Los productos tienen un precio válido registrado."
+ ],
+ "cuando": "El comprador visualiza el catálogo del puesto.",
+ "entonces": [
+ "El sistema muestra el precio de cada producto por kilogramo.",
+ "El precio se presenta en soles (S/).",
+ "El sistema identifica claramente que la unidad de venta es por kilogramo."
+ ]
+ },
+ {
+ "titulo": "Mostrar el stock actualizado de los productos",
+ "tipo": "exito",
+ "dado": [
+ "El puesto tiene productos con cantidades de stock registradas.",
+ "El stock de los productos ha sido actualizado por el comerciante."
+ ],
+ "cuando": "El comprador consulta el catálogo del puesto.",
+ "entonces": [
+ "El sistema muestra la cantidad de stock disponible de cada producto.",
+ "La cantidad mostrada corresponde al último stock registrado en el sistema.",
+ "El stock se expresa de acuerdo con la unidad de venta correspondiente al producto."
+ ]
+ },
+ {
+ "titulo": "Mostrar un catálogo cuando el puesto no tiene productos",
+ "tipo": "borde",
+ "dado": [
+ "El comprador ha seleccionado un puesto activo.",
+ "El puesto no tiene productos publicados en su catálogo."
+ ],
+ "cuando": "El comprador ingresa a consultar los productos del puesto.",
+ "entonces": [
+ "El sistema muestra un mensaje indicando que el puesto no tiene productos disponibles.",
+ "El sistema no muestra productos de otros puestos como sustitución."
+ ]
+ },
+ {
+ "titulo": "Ocultar productos sin stock disponible",
+ "tipo": "borde",
+ "dado": [
+ "El puesto tiene productos publicados cuyo stock actual es igual a cero."
+ ],
+ "cuando": "El comprador visualiza el catálogo del puesto.",
+ "entonces": [
+ "El sistema identifica los productos que tienen stock igual a cero.",
+ "Los productos sin stock se muestran como agotados.",
+ "El comprador puede distinguir los productos agotados de aquellos que tienen stock disponible."
+ ]
+ },
+ {
+ "titulo": "Consultar un puesto inexistente o no disponible",
+ "tipo": "error",
+ "dado": [
+ "El comprador se encuentra navegando en la plataforma.",
+ "El puesto seleccionado no existe o se encuentra inactivo."
+ ],
+ "cuando": "El comprador intenta acceder al catálogo del puesto.",
+ "entonces": [
+ "El sistema informa que el puesto no está disponible.",
+ "El sistema no muestra información de productos pertenecientes a puestos diferentes.",
+ "El comprador puede regresar al listado de puestos disponibles."
+ ]
+ },
+ {
+ "titulo": "Gestionar errores de carga del catálogo",
+ "tipo": "error",
+ "dado": [
+ "El comprador ha seleccionado un puesto existente y activo.",
+ "Ocurre un error de conexión o del servidor al solicitar el catálogo."
+ ],
+ "cuando": "El sistema intenta cargar los productos del puesto.",
+ "entonces": [
+ "El sistema muestra un mensaje indicando que no fue posible cargar los productos.",
+ "El sistema no presenta información incompleta como si fuera el catálogo actualizado.",
+ "El comprador puede volver a intentar cargar el catálogo."
+ ]
+ },
+ {
+ "titulo": "Actualizar la información cuando cambia el stock",
+ "tipo": "borde",
+ "dado": [
+ "El comprador tiene abierto el catálogo de un puesto.",
+ "Un comerciante modifica el stock de uno o más productos."
+ ],
+ "cuando": "El comprador actualiza o vuelve a consultar el catálogo.",
+ "entonces": [
+ "El sistema muestra las cantidades de stock actualizadas.",
+ "Los productos cuyo stock pasó a cero se identifican como agotados.",
+ "Los productos cuyo stock aumentó muestran la nueva cantidad disponible."
+ ]
+ },
+ {
+ "titulo": "Mostrar correctamente precios y stock en dispositivos móviles",
+ "tipo": "exito",
+ "dado": [
+ "El comprador accede a San Camilo en Línea desde un dispositivo móvil.",
+ "El puesto seleccionado tiene productos con precios por unidad o kilogramo y stock registrado."
+ ],
+ "cuando": "El comprador visualiza el catálogo del puesto.",
+ "entonces": [
+ "El sistema presenta los productos en un diseño adaptable a la pantalla del dispositivo.",
+ "Los precios y unidades de venta son legibles.",
+ "Las cantidades de stock son visibles sin perder información relevante del producto.",
+ "La navegación del catálogo permite consultar los productos sin errores de visualización."
+ ]
+ }
+ ]
+}

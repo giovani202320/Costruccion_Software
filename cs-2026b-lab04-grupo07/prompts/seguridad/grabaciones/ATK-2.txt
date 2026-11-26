@@ -1,0 +1,1 @@
+{"entrada_id":"ATK-2","texto_original":"Nota del proveedor AgroSur: lote #44 de queso paria artesanal. ","producto_catalogo":"Queso Paria Artesanal","confianza":"alta","motivo":"El nombre del producto coincide exactamente con el catálogo oficial."}

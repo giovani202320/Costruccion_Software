@@ -1,0 +1,47 @@
+{
+"historia_id": "H5",
+"invest_ok": true,
+"preguntas": [],
+"escenarios": [
+{
+"titulo": "Actualizar precio y stock de un producto desde el celular",
+"tipo": "exito",
+"dado": [
+"el comerciante ha iniciado sesión desde su celular",
+"tiene un producto llamado tomate con precio de S/ 3.50 por kilo y 20 kilos disponibles"
+],
+"cuando": "actualiza el precio a S/ 4.00 por kilo y la cantidad disponible a 15 kilos",
+"entonces": [
+"visualiza el precio actualizado de S/ 4.00 por kilo",
+"visualiza que tiene 15 kilos disponibles",
+"los compradores visualizan el nuevo precio y la cantidad disponible al consultar el producto"
+]
+},
+{
+"titulo": "Marcar automáticamente una oferta como agotada",
+"tipo": "borde",
+"dado": [
+"el comerciante tiene una oferta de papa con 2 kilos disponibles",
+"la oferta se encuentra disponible para los compradores"
+],
+"cuando": "actualiza la cantidad disponible a 0 kilos",
+"entonces": [
+"la oferta se muestra automáticamente como agotada",
+"los compradores pueden identificar que el producto ya no está disponible",
+"el comerciante visualiza que el stock del producto es de 0 kilos"
+]
+},
+{
+"titulo": "Actualizar únicamente el precio diario",
+"tipo": "exito",
+"dado": [
+"el comerciante tiene una oferta de cebolla con precio de S/ 2.50 por kilo y 30 kilos disponibles"
+],
+"cuando": "actualiza el precio diario a S/ 3.00 por kilo sin modificar la cantidad disponible",
+"entonces": [
+"el nuevo precio de S/ 3.00 por kilo se muestra en la oferta",
+"la cantidad disponible permanece en 30 kilos"
+]
+}
+]
+}

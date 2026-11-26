@@ -1,0 +1,7 @@
+{
+"entrada_id": "N4",
+"texto_original": "rocoto arequipeno rojo pa relleno",
+"producto_catalogo": "Rocoto Arequipeño",
+"confianza": "alta",
+"motivo": "Coincide inequívocamente con Rocoto Arequipeño; se normaliza la falta de tilde y se descarta la descripción adicional."
+}

@@ -1,0 +1,14 @@
+H2. Carrito con productos de distintos puestos
+CA01 – Agregar productos: El cliente debe poder agregar al carrito productos pertenecientes a diferentes puestos del mercado.
+
+CA02 – Validación de stock: El sistema debe verificar que la cantidad solicitada no supere el stock disponible de cada oferta.
+
+CA03 – Actualización del carrito: El cliente debe poder modificar las cantidades o eliminar productos antes de confirmar el pedido.
+
+CA04 – Consolidación del pedido: El sistema debe calcular el importe total considerando todos los productos agregados al carrito.
+
+CA05 – Generación de subórdenes: Al confirmar la compra, el sistema debe generar un pedido principal y dividirlo en subórdenes independientes por cada puesto involucrado.
+
+CA06 – Identificación de comerciantes: Cada suborden debe contener exclusivamente los productos correspondientes al puesto respectivo.
+
+CA07 – Revalidación de stock: Antes de confirmar el pedido, el sistema debe comprobar nuevamente la disponibilidad de todos los productos.

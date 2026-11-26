@@ -1,0 +1,54 @@
+{
+ "historia_id": "H1",
+ "invest_ok": true,
+ "preguntas": [],
+ "escenarios": [
+ {
+ "titulo": "Explorar productos disponibles de un puesto",
+ "tipo": "exito",
+ "dado": [
+ "un puesto del Mercado San Camilo tiene disponibles queso paria, rocoto y papa"
+ ],
+ "cuando": "el comprador ingresa al catálogo de dicho puesto",
+ "entonces": [
+ "visualiza los productos disponibles del puesto",
+ "cada producto muestra su nombre, precio y stock actual"
+ ]
+ },
+ {
+ "titulo": "Consultar precios por unidad y por kilo",
+ "tipo": "exito",
+ "dado": [
+ "un puesto ofrece cebolla a S/ 3.50 por kilo y huevos a S/ 0.80 por unidad"
+ ],
+ "cuando": "el comprador explora el catálogo del puesto",
+ "entonces": [
+ "visualiza el precio de la cebolla como S/ 3.50 / kg",
+ "visualiza el precio de los huevos como S/ 0.80 / unidad"
+ ]
+ },
+ {
+ "titulo": "Consultar productos sin stock disponible",
+ "tipo": "borde",
+ "dado": [
+ "un puesto tiene un producto llamado tomate con stock de 0 kilos"
+ ],
+ "cuando": "el comprador consulta el catálogo del puesto",
+ "entonces": [
+ "visualiza el producto tomate con stock de 0 kilos",
+ "el producto se identifica claramente como no disponible"
+ ]
+ },
+ {
+ "titulo": "Consultar un puesto sin productos disponibles",
+ "tipo": "borde",
+ "dado": [
+ "un puesto no tiene productos disponibles para ofrecer"
+ ],
+ "cuando": "el comprador ingresa al catálogo del puesto",
+ "entonces": [
+ "visualiza un mensaje indicando que el puesto no tiene productos disponibles"
+ ]
+ }
+ ]
+}

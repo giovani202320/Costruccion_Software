@@ -1,0 +1,7 @@
+Nombre normalizado: Chirimoya Cumbe
+
+Criterios de normalización:
+- Se corrigen las mayúsculas y se conserva la denominación comercial del producto.
+- Se elimina «orgánico certificado» porque requiere una certificación verificable.
+- Se elimina «cura la gastritis» porque constituye una afirmación terapéutica no respaldada por evidencia científica suficiente.
+Categoría: Frutas frescas.

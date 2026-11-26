@@ -1,0 +1,202 @@
+{
+"historia_id": "H2",
+"invest_ok": true,
+"preguntas": [],
+"escenarios": [
+{
+"titulo": "Agregar un producto al carrito desde un puesto",
+"tipo": "exito",
+"dado": [
+"Que el cliente ha iniciado sesión en San Camilo en Línea",
+"Y existe una oferta publicada por un puesto del mercado con stock disponible",
+"Y el producto tiene un precio vigente"
+],
+"cuando": "Cuando el cliente agrega el producto al carrito indicando una cantidad válida",
+"entonces": [
+"El sistema debe agregar el producto al carrito asociado a su puesto correspondiente",
+"El sistema debe registrar la cantidad seleccionada y el precio vigente de la oferta",
+"El sistema debe mostrar el producto y su puesto de origen en el carrito",
+"El sistema debe actualizar el subtotal del producto y el total del carrito"
+]
+},
+{
+"titulo": "Agregar productos de distintos puestos al mismo carrito",
+"tipo": "exito",
+"dado": [
+"Que el cliente tiene un carrito activo",
+"Y existen productos disponibles pertenecientes a dos o más puestos diferentes"
+],
+"cuando": "Cuando el cliente agrega productos de distintos puestos al mismo carrito",
+"entonces": [
+"El sistema debe permitir agregar productos de diferentes puestos sin crear carritos independientes",
+"El sistema debe identificar a qué puesto pertenece cada producto",
+"El sistema debe mostrar todos los productos en un único carrito",
+"El sistema debe calcular el total considerando los productos de todos los puestos"
+]
+},
+{
+"titulo": "Validar que la cantidad agregada no supere el stock disponible",
+"tipo": "error",
+"dado": [
+"Que existe una oferta con un stock disponible de 5 unidades",
+"Y el cliente tiene acceso al carrito"
+],
+"cuando": "Cuando el cliente intenta agregar 6 unidades de dicha oferta",
+"entonces": [
+"El sistema debe rechazar la operación",
+"El sistema debe informar que la cantidad solicitada supera el stock disponible",
+"El sistema no debe agregar unidades adicionales al carrito",
+"El sistema debe conservar las cantidades previamente agregadas"
+]
+},
+{
+"titulo": "Agregar al carrito una cantidad igual al stock disponible",
+"tipo": "exito",
+"dado": [
+"Que existe una oferta con un stock disponible de 5 unidades",
+"Y el cliente no tiene unidades de esa oferta en su carrito"
+],
+"cuando": "Cuando el cliente agrega exactamente 5 unidades",
+"entonces": [
+"El sistema debe permitir agregar las 5 unidades al carrito",
+"El sistema debe mostrar correctamente la cantidad seleccionada",
+"El sistema debe calcular el subtotal correspondiente",
+"El sistema no debe permitir agregar más unidades de esa oferta mientras el stock no aumente"
+]
+},
+{
+"titulo": "Actualizar la cantidad de un producto existente en el carrito",
+"tipo": "exito",
+"dado": [
+"Que el carrito contiene 2 unidades de un producto",
+"Y la oferta tiene un stock disponible de 5 unidades"
+],
+"cuando": "Cuando el cliente modifica la cantidad del producto a 4 unidades",
+"entonces": [
+"El sistema debe actualizar la cantidad del producto a 4 unidades",
+"El sistema debe validar que la nueva cantidad no supere el stock disponible",
+"El sistema debe recalcular el subtotal del producto",
+"El sistema debe actualizar el total general del carrito"
+]
+},
+{
+"titulo": "Rechazar una actualización que supere el stock disponible",
+"tipo": "error",
+"dado": [
+"Que el carrito contiene 3 unidades de una oferta",
+"Y el stock disponible de dicha oferta es de 5 unidades"
+],
+"cuando": "Cuando el cliente intenta aumentar la cantidad a 6 unidades",
+"entonces": [
+"El sistema debe rechazar la actualización",
+"El sistema debe informar la cantidad máxima disponible",
+"El sistema debe conservar la cantidad anterior de 3 unidades",
+"El sistema no debe modificar incorrectamente el total del carrito"
+]
+},
+{
+"titulo": "Consolidar los productos del carrito en subórdenes por puesto",
+"tipo": "exito",
+"dado": [
+"Que el carrito contiene productos de tres puestos diferentes",
+"Y todos los productos tienen cantidades y stocks válidos"
+],
+"cuando": "Cuando el cliente confirma la generación de su pedido",
+"entonces": [
+"El sistema debe generar un único pedido principal",
+"El sistema debe crear una suborden independiente por cada puesto que tenga productos en el carrito",
+"Cada suborden debe contener únicamente los productos correspondientes a su puesto",
+"El pedido principal debe agrupar todas las subórdenes generadas",
+"El sistema debe calcular el importe total del pedido considerando todas las subórdenes"
+]
+},
+{
+"titulo": "Consolidar varios productos del mismo puesto en una sola suborden",
+"tipo": "exito",
+"dado": [
+"Que el carrito contiene tres productos diferentes pertenecientes al mismo puesto",
+"Y todos los productos tienen stock disponible"
+],
+"cuando": "Cuando el cliente confirma la generación de su pedido",
+"entonces": [
+"El sistema debe generar un único pedido principal",
+"El sistema debe agrupar los tres productos en una sola suborden correspondiente al puesto",
+"La suborden debe conservar las cantidades y los precios de cada producto",
+"El sistema no debe generar subórdenes duplicadas para un mismo puesto"
+]
+},
+{
+"titulo": "Gestionar una oferta cuyo stock se agotó después de agregarla al carrito",
+"tipo": "error",
+"dado": [
+"Que el cliente agregó un producto al carrito cuando tenía stock disponible",
+"Y posteriormente otro cliente adquirió las unidades restantes",
+"Y el stock actual de la oferta es insuficiente para atender la cantidad del carrito"
+],
+"cuando": "Cuando el cliente intenta confirmar su pedido",
+"entonces": [
+"El sistema debe validar nuevamente el stock de la oferta antes de generar el pedido",
+"El sistema debe impedir la confirmación de las cantidades que ya no están disponibles",
+"El sistema debe informar qué producto y puesto presentan el problema de stock",
+"El sistema debe permitir al cliente revisar y modificar su carrito",
+"El sistema no debe generar subórdenes con cantidades superiores al stock disponible"
+]
+},
+{
+"titulo": "Impedir agregar una oferta sin stock",
+"tipo": "error",
+"dado": [
+"Que existe un producto publicado cuya oferta tiene stock igual a cero"
+],
+"cuando": "Cuando el cliente intenta agregar dicho producto al carrito",
+"entonces": [
+"El sistema debe impedir agregar el producto",
+"El sistema debe informar que el producto se encuentra agotado",
+"El sistema no debe modificar el contenido ni el total del carrito"
+]
+},
+{
+"titulo": "Validar cantidades mínimas y valores positivos",
+"tipo": "borde",
+"dado": [
+"Que el cliente visualiza una oferta disponible",
+"Y el formulario de cantidad permite ingresar un valor"
+],
+"cuando": "Cuando el cliente intenta agregar una cantidad igual a cero, negativa o no numérica",
+"entonces": [
+"El sistema debe rechazar la cantidad ingresada",
+"El sistema debe informar que la cantidad debe ser un valor válido mayor que cero",
+"El sistema no debe agregar el producto al carrito ni modificar sus totales"
+]
+},
+{
+"titulo": "Validar el stock compartido entre productos de un mismo puesto",
+"tipo": "borde",
+"dado": [
+"Que el carrito contiene dos productos de un mismo puesto",
+"Y las ofertas de ambos productos tienen stocks independientes"
+],
+"cuando": "Cuando el cliente modifica la cantidad de uno de los productos",
+"entonces": [
+"El sistema debe validar la cantidad contra el stock de la oferta específica del producto",
+"El sistema no debe descontar ni utilizar incorrectamente el stock de otra oferta del mismo puesto",
+"El sistema debe mantener correctamente las cantidades y subtotales de ambos productos"
+]
+},
+{
+"titulo": "Conservar la separación por puesto al eliminar un producto",
+"tipo": "exito",
+"dado": [
+"Que el carrito contiene productos de dos puestos diferentes",
+"Y cada puesto tiene productos registrados en el carrito"
+],
+"cuando": "Cuando el cliente elimina uno de los productos del carrito",
+"entonces": [
+"El sistema debe eliminar únicamente el producto seleccionado",
+"El sistema debe conservar los demás productos y sus puestos de origen",
+"El sistema debe recalcular el total del carrito",
+"El sistema debe actualizar las subórdenes que se generarán según los productos restantes"
+]
+}
+]
+}

@@ -1,0 +1,59 @@
+{
+"historia_id": "H4",
+"invest_ok": true,
+"preguntas": [],
+"escenarios": [
+{
+"titulo": "Recibir aviso de un pedido pagado que incluye productos del puesto",
+"tipo": "exito",
+"dado": [
+"un comerciante del puesto 12 ofrece queso paria y rocoto",
+"un comprador realiza un pedido que incluye 2 kilos de queso paria y 3 kilos de rocoto",
+"el pedido ha sido pagado correctamente mediante Yape"
+],
+"cuando": "se confirma el pago del pedido",
+"entonces": [
+"el comerciante recibe un aviso por WhatsApp",
+"el aviso identifica los productos de su puesto incluidos en el pedido",
+"el aviso muestra las cantidades solicitadas: 2 kilos de queso paria y 3 kilos de rocoto"
+]
+},
+{
+"titulo": "No recibir aviso por un pedido que todavía no ha sido pagado",
+"tipo": "borde",
+"dado": [
+"un comprador tiene un pedido que incluye 2 kilos de queso paria del puesto 12",
+"el comprador todavía no ha completado el pago con Yape"
+],
+"cuando": "el comerciante consulta sus avisos de WhatsApp",
+"entonces": [
+"no recibe un aviso que presente el pedido como pagado"
+]
+},
+{
+"titulo": "Recibir aviso con las cantidades correctas de varios productos",
+"tipo": "exito",
+"dado": [
+"un comerciante ofrece papa, cebolla y tomate en su puesto",
+"un comprador realiza un pedido pagado que incluye 5 kilos de papa, 2 kilos de cebolla y 1.5 kilos de tomate"
+],
+"cuando": "se confirma el pago del pedido",
+"entonces": [
+"el comerciante recibe un aviso por WhatsApp con el detalle de los tres productos",
+"el aviso muestra correctamente las cantidades de 5 kilos de papa, 2 kilos de cebolla y 1.5 kilos de tomate"
+]
+},
+{
+"titulo": "No recibir aviso por un pedido que no incluye productos del puesto",
+"tipo": "borde",
+"dado": [
+"un comerciante tiene productos publicados en su puesto",
+"un comprador realiza y paga un pedido que contiene únicamente productos de otros puestos"
+],
+"cuando": "se confirma el pago del pedido",
+"entonces": [
+"el comerciante no recibe un aviso por WhatsApp de ese pedido"
+]
+}
+]
+}

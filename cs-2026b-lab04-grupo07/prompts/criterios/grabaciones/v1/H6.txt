@@ -1,0 +1,16 @@
+H6. Selección de modalidad de entrega
+CA01 – Opciones de entrega: Al confirmar el pedido, el sistema debe permitir elegir entre recojo en los puestos del mercado o delivery.
+
+CA02 – Recojo en mercado: Si el cliente selecciona recojo, el sistema debe mostrar la dirección del puesto y el horario permitido de atención.
+
+CA03 – Horario de recojo: El sistema solo debe permitir programar el recojo dentro del horario de 06:00 a 17:00.
+
+CA04 – Selección de delivery: Si el cliente selecciona delivery, el sistema debe solicitar la dirección de entrega.
+
+CA05 – Validación de cobertura: El sistema debe verificar que la dirección ingresada se encuentre dentro de la zona de cobertura de Arequipa.
+
+CA06 – Dirección fuera de cobertura: Si la dirección no pertenece a la zona de cobertura, el sistema debe informar al cliente y no permitir seleccionar delivery.
+
+CA07 – Confirmación de modalidad: La modalidad seleccionada debe quedar registrada en el pedido principal.
+
+CA08 – Información al comerciante: Los comerciantes deben poder consultar la modalidad de entrega asociada a sus subórdenes.

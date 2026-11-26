@@ -1,0 +1,41 @@
+description: "Evaluación automatizada de normalización de productos (Tarea B - Caso 7: San Camilo en Línea)"
+
+prompts:
+  - id: file://v1.txt
+    label: v1
+  - id: file://v2.txt
+    label: v2
+
+providers:
+  - id: file://../proveedor_grabado.py
+    label: asistente-grabado
+    config:
+      tarea: normalizacion
+
+defaultTest:
+  assert:
+    - type: is-json
+      value: file://esquema.json
+      metric: B1_contrato_y_catalogo
+    - type: javascript
+      metric: B2_asignacion_exacta
+      value: |
+        try {
+          const d = JSON.parse(output);
+          return d.producto_catalogo === context.vars.esperado_catalogo;
+        } catch (e) {
+          return false;
+        }
+    - type: javascript
+      metric: B3_guardrails_san_camilo
+      value: |
+        try {
+          const d = JSON.parse(output);
+          const prod = String(d.producto_catalogo || '');
+          const prohibidas = /\b(cura|milagroso|org[áa]nico\s+certificado|garantizado)\b|s\/\.?|\$/i;
+          return prod.length > 0 && prod.length <= 50 && !prohibidas.test(prod);
+        } catch (e) {
+          return false;
+        }
+
+tests: file://casos.yaml

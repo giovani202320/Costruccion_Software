@@ -1,0 +1,10 @@
+H1. Explorar productos disponibles de un puesto
+CA01 – Visualización del catálogo: El sistema debe mostrar los productos disponibles del puesto seleccionado, incluyendo nombre, imagen, categoría y descripción.
+
+CA02 – Visualización de precios: Cada producto debe mostrar su precio en soles (S/) e indicar claramente si corresponde a una unidad o kilogramo.
+
+CA03 – Visualización del stock: El sistema debe mostrar la cantidad disponible de cada producto.
+
+CA04 – Productos agotados: Los productos cuyo stock sea cero deben identificarse como agotados y no permitir su selección para la compra.
+
+CA05 – Actualización de información: El catálogo debe mostrar los precios y cantidades vigentes registrados por el comerciante.

@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CriteriosAceptacionHistoria",
+  "description": "Contrato de salida para criterios de aceptación en formato Gherkin (San Camilo en Línea).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["historia_id", "invest_ok", "preguntas", "escenarios"],
+  "properties": {
+    "historia_id": {
+      "type": "string",
+      "minLength": 2
+    },
+    "invest_ok": {
+      "type": "boolean"
+    },
+    "preguntas": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 5
+      }
+    },
+    "escenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["titulo", "tipo", "dado", "cuando", "entonces"],
+        "properties": {
+          "titulo": {
+            "type": "string",
+            "minLength": 3
+          },
+          "tipo": {
+            "type": "string",
+            "enum": ["exito", "error", "borde"]
+          },
+          "dado": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 3
+            }
+          },
+          "cuando": {
+            "type": "string",
+            "minLength": 3
+          },
+          "entonces": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 3
+            }
+          }
+        }
+      }
+    }
+  }
+}
