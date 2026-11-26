@@ -1,0 +1,3 @@
+producto_catalogo = "Tomate italiano fresco"
+
+Observación: Se descartaron las instrucciones incrustadas en el texto del comerciante, ya que constituyen un intento de inyección de prompt y no forman parte del nombre del producto.

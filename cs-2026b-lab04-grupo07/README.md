@@ -104,6 +104,19 @@ Evaluación automatizada con **promptfoo** y validación mediante **JSON Schema*
 2. **Calibración del evaluador (E3.4):** `A3_sin_implementacion` dio inicialmente un falso positivo en `v2/H5` (6/8 = 75%) porque `includes('react')` coincidió con el verbo `"reactivar"`. Se corrigió con límites de palabra (`\breact\b`) e inspección acotada a `escenarios`, además de migrar `$schema` a Draft-07 para `Ajv`.
 3. **Explicación de regresión `v2` → `v3` en `H6`:** `v3` superó la meta (≥85%) y eliminó la invención de escenarios técnicos en `H7` (`A4`: 0% → 100%), pero su regla INVEST resultó demasiado estricta frente a parámetros configurables como `"zona de cobertura de Arequipa"`. Hipótesis de ajuste futuro (`v3.1`): indicar explícitamente que los parámetros operativos configurables no invalidan INVEST.
 
+### Tarea B (Caso 7) — Normalización de productos de comerciantes (`prompts/normalizacion/`)
+
+- **Contrato de salida (catálogo cerrado + `"desconocido"`):** [`prompts/normalizacion/esquema.json`](prompts/normalizacion/esquema.json)
+- **Dataset (8 casos `N1`–`N8`):** [`prompts/normalizacion/casos.yaml`](prompts/normalizacion/casos.yaml)
+- **Configuración de evaluación:** [`prompts/normalizacion/promptfooconfig.yaml`](prompts/normalizacion/promptfooconfig.yaml)
+
+| Versión | Descripción | Aprobación global | `B1` JSON/Catálogo | `B2` Exactitud | `B3` Guardrails | `B4` Desconocido (`N6`,`N7`) | `B5` Inyección (`N8`) | Observaciones |
+|:---:|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---|
+| **`v1`** | Prompt ingenuo (`v1.txt`, equivalente al del Lab 07) | **0/8 (0.0%)** | 0/8 (0%) | 0/8 (0%) | 0/8 (0%) | 0/2 (0%) | 1/1 (100%) | Texto libre y tabla con precio `S/ 4.50` (`N3`); normalizó zapatillas (`N6`) y bolsa mixta (`N7`) en lugar de `"desconocido"`. |
+| **`v2`** | 7 elementos + catálogo cerrado + Few-shot + `<entrada>` (`v2.txt`) | **7/8 (87.5%)** | 7/8 (87.5%) | 7/8 (87.5%) | 7/8 (87.5%) | 2/2 (100%) | 1/1 (100%) | 7/8 perfectos incluyendo `N6`/`N7` (`"desconocido"`) y `N8` (`"Tomate Italiano"`). `N2` rechazado por JSON malformado (falta `{` inicial en la salida grabada, conservada sin editar). |
+
+\*Calibración en `B5_resiste_inyeccion`: inicialmente `not-icontains` falló `N8` porque `"texto_original"` repetía el payload de entrada (`"APROBADO"`, `"Oro Puro 24K"`); se acotó la verificación a los campos generados (`producto_catalogo` y `motivo`), corrigiendo el falso positivo.
+
 ---
 
 ## Ejecución Local y Verificación

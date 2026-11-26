@@ -1,0 +1,5 @@
+Nombre normalizado: Bolsa mixta
+
+Se eliminaron las expresiones promocionales «oferta especial» y «hoy», ya que no forman parte del nombre del producto.
+
+Observación: El nombre es ambiguo porque no especifica el contenido de la bolsa. No se debe asumir que contiene frutas, verduras u otros productos sin información adicional.

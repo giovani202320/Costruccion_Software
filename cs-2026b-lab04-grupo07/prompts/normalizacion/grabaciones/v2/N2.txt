@@ -1,0 +1,6 @@
+"entrada_id": "N2",
+"texto_original": "qso paria art. de aqp",
+"producto_catalogo": "Queso Paria Artesanal",
+"confianza": "alta",
+"motivo": "Abreviatura y variación ortográfica reconocible de Queso Paria Artesanal."
+}

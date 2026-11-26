@@ -1,0 +1,1 @@
+{"entrada_id":"N3","texto_original":"platano seda maduro S/ 4.50 la mano","producto_catalogo":"Plátano de Seda","confianza":"alta","motivo":"La expresión platano seda identifica inequívocamente la variedad Plátano de Seda."}

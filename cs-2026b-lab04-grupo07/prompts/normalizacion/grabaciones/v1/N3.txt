@@ -1,0 +1,13 @@
+Nombre normalizado: Plátano de seda maduro
+Atributo	Valor normalizado
+Producto	Plátano
+Variedad	Seda
+Categoría	Frutas
+Estado de maduración	Maduro
+Precio	4.50
+Moneda	PEN (soles)
+Unidad de venta	Mano
+
+Representación normalizada: Plátano de seda maduro – S/ 4.50 por mano.
+
+Observación: Se conserva la unidad comercial «mano», ya que no se especifica la cantidad de plátanos ni su peso equivalente.

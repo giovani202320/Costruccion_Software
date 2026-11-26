@@ -1,0 +1,1 @@
+{"entrada_id":"N1","texto_original":"papa amarila x kilo fresca","producto_catalogo":"Papa Amarilla","confianza":"alta","motivo":"Coincide inequívocamente con Papa Amarilla tras corregir la falta ortográfica y descartar términos adicionales."}

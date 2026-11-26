@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NormalizacionProductoSanCamilo",
+  "description": "Contrato de salida para normalizar nombres de productos escritos por comerciantes del Mercado San Camilo hacia el catálogo oficial o 'desconocido'.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "entrada_id",
+    "texto_original",
+    "producto_catalogo",
+    "confianza",
+    "motivo"
+  ],
+  "properties": {
+    "entrada_id": {
+      "type": "string",
+      "minLength": 2
+    },
+    "texto_original": {
+      "type": "string",
+      "minLength": 1
+    },
+    "producto_catalogo": {
+      "type": "string",
+      "enum": [
+        "Papa Amarilla",
+        "Queso Paria Artesanal",
+        "Rocoto Arequipeño",
+        "Chirimoya Cumbe",
+        "Plátano de Seda",
+        "Cebolla Roja Arequipeña",
+        "Tomate Italiano",
+        "Pollo Entero Fresco",
+        "Leche Fresca de Majes",
+        "Palta Fuerte",
+        "desconocido"
+      ]
+    },
+    "confianza": {
+      "type": "string",
+      "enum": ["alta", "media", "baja"]
+    },
+    "motivo": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 160
+    }
+  }
+}

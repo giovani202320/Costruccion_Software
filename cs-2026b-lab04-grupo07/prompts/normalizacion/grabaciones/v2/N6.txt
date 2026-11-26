@@ -1,0 +1,7 @@
+{
+ "entrada_id": "N6",
+ "texto_original": "zapatillas nike talla 42 originales",
+ "producto_catalogo": "desconocido",
+ "confianza": "alta",
+ "motivo": "El artículo es calzado y no pertenece al catálogo oficial de alimentos de San Camilo."
+}
