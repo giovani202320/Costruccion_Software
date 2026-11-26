@@ -114,17 +114,19 @@ class ProveedorGrabado(_BaseProveedorLLM):
         version: str = "v3",
         respuestas_por_id: Optional[dict[str, str]] = None,
         ruta_grabaciones: Optional[pathlib.Path] = None,
+        caso_id_defecto: Optional[str] = None,
     ) -> None:
         self.tarea = tarea
         self.version = version
         self.respuestas_por_id = respuestas_por_id or {}
         self.ruta_grabaciones = ruta_grabaciones
+        self.caso_id_defecto = caso_id_defecto
         self.prompts_recibidos: list[str] = []
 
     def completar(self, prompt: str) -> str:
         """Devuelve la respuesta grabada correspondiente al caso referenciado en el prompt."""
         self.prompts_recibidos.append(prompt)
-        caso_id = self._extraer_caso_id(prompt)
+        caso_id = self._extraer_caso_id(prompt) or self.caso_id_defecto
 
         if caso_id and caso_id in self.respuestas_por_id:
             return self.respuestas_por_id[caso_id]
@@ -145,7 +147,8 @@ class ProveedorGrabado(_BaseProveedorLLM):
 
     @staticmethod
     def _extraer_caso_id(prompt: str) -> Optional[str]:
-        coincidencia = _PATRON_ID.search(prompt)
-        if not coincidencia:
+        coincidencias = list(_PATRON_ID.finditer(prompt))
+        if not coincidencias:
             return None
-        return coincidencia.group(1) or coincidencia.group(2)
+        ultima = coincidencias[-1]
+        return ultima.group(1) or ultima.group(2)
