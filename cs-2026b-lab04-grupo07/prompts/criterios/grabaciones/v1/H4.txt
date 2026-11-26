@@ -1,0 +1,12 @@
+H4. Notificación por WhatsApp al comerciante
+CA01 – Envío de notificación: Cuando se valide el pago de un pedido, el sistema debe enviar una notificación por WhatsApp a cada comerciante involucrado.
+
+CA02 – Información del pedido: La notificación debe incluir el identificador del pedido y los productos correspondientes a su puesto.
+
+CA03 – Detalle de cantidades: Cada producto debe mostrar su nombre, cantidad solicitada, unidad de medida y observaciones, si existen.
+
+CA04 – Notificaciones independientes: Cada comerciante debe recibir únicamente la información de su propia suborden.
+
+CA05 – Control de envío: El sistema debe registrar el estado del envío de cada notificación.
+
+CA06 – Fallos de notificación: Si el envío falla, el sistema debe registrar el error y permitir reintentar la notificación.

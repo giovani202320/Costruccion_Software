@@ -1,0 +1,16 @@
+H3. Pago único mediante Yape
+CA01 – Pago consolidado: El sistema debe calcular y mostrar el monto total correspondiente a todas las subórdenes.
+
+CA02 – Registro del número de operación: El cliente debe ingresar un número de operación de exactamente 6 dígitos numéricos.
+
+CA03 – Validación del comprobante: El sistema debe permitir adjuntar una captura del comprobante de pago.
+
+CA04 – Tiempo límite: El cliente debe registrar el pago dentro de los 15 minutos posteriores a la reserva del pedido.
+
+CA05 – Vencimiento de reserva: Si transcurren los 15 minutos sin registrar el pago, el sistema debe cancelar la reserva y liberar el stock reservado.
+
+CA06 – Validación del pago: El pedido debe permanecer pendiente de validación hasta que se compruebe la información del pago.
+
+CA07 – Prevención de duplicados: El sistema debe impedir registrar dos veces el mismo número de operación.
+
+CA08 – Confirmación: Una vez validado el pago, el sistema debe marcar el pedido principal y sus subórdenes como pagados.

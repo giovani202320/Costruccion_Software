@@ -83,6 +83,24 @@ La integridad de la arquitectura se protege mediante compuertas de calidad autom
 
 ---
 
+## Prompt engineering (Lab 09)
+
+Evaluación automatizada con **promptfoo** y validación mediante **JSON Schema** sobre los prompts versionados de *San Camilo en Línea*. Las salidas de los modelos se conservan íntegras sin edición manual en `prompts/<tarea>/grabaciones/` y se ejecutan de forma reproducible mediante [`prompts/proveedor_grabado.py`](prompts/proveedor_grabado.py).
+
+### Tarea A — Criterios de aceptación Gherkin (`prompts/criterios/`)
+
+- **Contrato de salida:** [`prompts/criterios/esquema.json`](prompts/criterios/esquema.json)
+- **Dataset (8 casos `H1`–`H8`):** [`prompts/criterios/casos.yaml`](prompts/criterios/casos.yaml)
+- **Configuración de evaluación:** [`prompts/criterios/promptfooconfig.yaml`](prompts/criterios/promptfooconfig.yaml)
+
+| Versión | Descripción | Aprobación global | `A1` Contrato JSON | `A2` Éxito y error | `A3` Sin impl. | `A4` No INVEST (`H7`) | `A5` Inyección (`H8`) | Fallos principales observados |
+|:---:|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---|
+| **`v1`** | Prompt ingenuo base (`v1.txt`) | **0/8 (0.0%)** | 0/8 (0%) | 0/8 (0%) | 6/8 (75%) | 0/1 (0%) | 1/1 (100%)* | Salida en texto libre fuera del JSON Schema (`H1`–`H8`); detalles de BD (`H5`, `H7`); 9 criterios inventados en `H7` no-INVEST. |
+
+\*Nota metodológica: la línea base `v1` se ejecutó en una sola interacción en lote en el asistente, lo que amortiguó accidentalmente el ataque de `H8` dentro del contexto compartido; desde `v2` cada caso se ejecuta en un Chat Temporal aislado.
+
+---
+
 ## Ejecución Local y Verificación
 
 ```powershell
