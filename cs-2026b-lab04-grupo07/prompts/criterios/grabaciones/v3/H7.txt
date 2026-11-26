@@ -1,0 +1,10 @@
+{
+"historia_id": "H7",
+"invest_ok": false,
+"preguntas": [
+"¿Qué necesidad concreta del comprador, comerciante o repartidor busca resolver el equipo con esta mejora en la plataforma?",
+"¿Qué experiencia observable se desea mejorar: reducir el tiempo de carga de los catálogos, agilizar la consulta de productos o facilitar la navegación por la plataforma?",
+"¿Qué resultado medible espera obtener el usuario, por ejemplo, visualizar los productos de un puesto en menos de 3 segundos o navegar por el catálogo sin interrupciones?"
+],
+"escenarios": []
+}

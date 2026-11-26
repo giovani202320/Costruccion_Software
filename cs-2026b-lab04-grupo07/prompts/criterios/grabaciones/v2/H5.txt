@@ -1,0 +1,201 @@
+{
+"historia_id": "H5",
+"invest_ok": true,
+"preguntas": [],
+"escenarios": [
+{
+"titulo": "Actualizar correctamente el precio y stock de un producto",
+"tipo": "exito",
+"dado": [
+"Que el comerciante ha iniciado sesión en San Camilo en Línea",
+"Y tiene productos registrados en su puesto",
+"Y selecciona un producto disponible para actualizar"
+],
+"cuando": "Cuando modifica el precio diario en soles y la cantidad disponible con valores válidos, y confirma la actualización",
+"entonces": [
+"El sistema guarda el nuevo precio y la cantidad disponible del producto",
+"El precio se muestra en soles (S/)",
+"El sistema muestra un mensaje de confirmación de actualización exitosa",
+"Los compradores visualizan el precio y stock actualizados"
+]
+},
+{
+"titulo": "Marcar automáticamente como agotado un producto cuando el stock llega a cero",
+"tipo": "exito",
+"dado": [
+"Que el comerciante tiene un producto registrado con stock mayor a cero",
+"Y el producto se encuentra disponible para la venta"
+],
+"cuando": "Cuando el comerciante actualiza la cantidad disponible del producto a cero",
+"entonces": [
+"El sistema guarda el stock con valor cero",
+"El sistema cambia automáticamente el estado de la oferta a agotada",
+"El producto deja de mostrarse como disponible para la compra",
+"El sistema informa al comerciante que el producto ha sido marcado como agotado"
+]
+},
+{
+"titulo": "Reactivar un producto anteriormente agotado",
+"tipo": "exito",
+"dado": [
+"Que el comerciante tiene un producto cuyo stock es cero",
+"Y su oferta se encuentra marcada como agotada"
+],
+"cuando": "Cuando actualiza el stock del producto con una cantidad mayor a cero",
+"entonces": [
+"El sistema guarda la nueva cantidad disponible",
+"El sistema cambia automáticamente el estado de la oferta a disponible",
+"El producto vuelve a mostrarse como disponible para los compradores"
+]
+},
+{
+"titulo": "Actualizar únicamente el precio de un producto",
+"tipo": "exito",
+"dado": [
+"Que el comerciante tiene un producto registrado con precio y stock válidos"
+],
+"cuando": "Cuando modifica únicamente el precio diario y confirma la actualización",
+"entonces": [
+"El sistema guarda el nuevo precio",
+"El stock permanece sin modificaciones",
+"El estado de disponibilidad del producto se mantiene según su stock actual"
+]
+},
+{
+"titulo": "Actualizar únicamente el stock de un producto",
+"tipo": "exito",
+"dado": [
+"Que el comerciante tiene un producto registrado con precio y stock válidos"
+],
+"cuando": "Cuando modifica únicamente la cantidad disponible y confirma la actualización",
+"entonces": [
+"El sistema guarda la nueva cantidad disponible",
+"El precio permanece sin modificaciones",
+"El estado de la oferta se actualiza automáticamente según el stock registrado"
+]
+},
+{
+"titulo": "Impedir el registro de un precio negativo",
+"tipo": "error",
+"dado": [
+"Que el comerciante está actualizando el precio de un producto"
+],
+"cuando": "Cuando ingresa un precio menor que cero e intenta guardar los cambios",
+"entonces": [
+"El sistema rechaza la actualización",
+"El sistema muestra un mensaje indicando que el precio debe ser mayor o igual a cero",
+"El precio anterior permanece sin modificaciones"
+]
+},
+{
+"titulo": "Impedir el registro de un stock negativo",
+"tipo": "error",
+"dado": [
+"Que el comerciante está actualizando la cantidad disponible de un producto"
+],
+"cuando": "Cuando ingresa una cantidad menor que cero e intenta guardar los cambios",
+"entonces": [
+"El sistema rechaza la actualización",
+"El sistema muestra un mensaje indicando que el stock no puede ser negativo",
+"La cantidad disponible anterior permanece sin modificaciones"
+]
+},
+{
+"titulo": "Validar campos obligatorios y formatos numéricos",
+"tipo": "error",
+"dado": [
+"Que el comerciante se encuentra en el formulario de actualización de un producto"
+],
+"cuando": "Cuando deja vacío un campo obligatorio o ingresa caracteres no numéricos en el precio o stock",
+"entonces": [
+"El sistema impide guardar la actualización",
+"El sistema identifica los campos que contienen datos inválidos",
+"El sistema muestra mensajes indicando cómo corregir los valores",
+"Los datos previamente registrados permanecen sin modificaciones"
+]
+},
+{
+"titulo": "Aceptar precios con valores decimales",
+"tipo": "borde",
+"dado": [
+"Que el comerciante está actualizando el precio de un producto"
+],
+"cuando": "Cuando ingresa un precio decimal válido, por ejemplo S/ 2.50, y confirma la actualización",
+"entonces": [
+"El sistema acepta y guarda el precio decimal",
+"El precio se muestra correctamente con dos decimales y el símbolo S/",
+"El valor guardado coincide con el ingresado"
+]
+},
+{
+"titulo": "Actualizar el stock con una cantidad entera",
+"tipo": "borde",
+"dado": [
+"Que el comerciante está actualizando la cantidad disponible de un producto"
+],
+"cuando": "Cuando ingresa una cantidad entera igual a uno y confirma la actualización",
+"entonces": [
+"El sistema guarda correctamente el stock con valor uno",
+"La oferta permanece disponible para la compra",
+"El sistema no marca el producto como agotado"
+]
+},
+{
+"titulo": "Impedir cantidades de stock decimales",
+"tipo": "error",
+"dado": [
+"Que el comerciante está actualizando el stock de un producto cuya unidad de control requiere cantidades enteras"
+],
+"cuando": "Cuando ingresa una cantidad decimal, por ejemplo 2.5, e intenta guardar los cambios",
+"entonces": [
+"El sistema rechaza el valor ingresado",
+"El sistema informa que la cantidad debe ser un número entero",
+"El stock anterior permanece sin modificaciones"
+]
+},
+{
+"titulo": "Conservar los datos ante un error de conexión",
+"tipo": "error",
+"dado": [
+"Que el comerciante está actualizando el precio o stock de un producto desde su celular",
+"Y se pierde la conexión a Internet antes de confirmar la actualización"
+],
+"cuando": "Cuando intenta guardar los cambios",
+"entonces": [
+"El sistema informa que no fue posible completar la actualización por falta de conexión",
+"El sistema no muestra la actualización como exitosa",
+"Los datos previamente guardados permanecen intactos",
+"El comerciante puede volver a intentar la operación cuando recupere la conexión"
+]
+},
+{
+"titulo": "Impedir que un comerciante actualice productos de otro puesto",
+"tipo": "error",
+"dado": [
+"Que el comerciante ha iniciado sesión en la plataforma",
+"Y existe un producto registrado que pertenece a otro puesto del mercado"
+],
+"cuando": "Cuando intenta modificar el precio o stock de ese producto",
+"entonces": [
+"El sistema rechaza la operación por falta de autorización",
+"El sistema no modifica el precio ni el stock del producto",
+"El sistema informa que únicamente puede actualizar productos de su propio puesto"
+]
+},
+{
+"titulo": "Reflejar la actualización en la vista de los compradores",
+"tipo": "exito",
+"dado": [
+"Que el comerciante ha actualizado correctamente el precio y stock de un producto",
+"Y la actualización ha sido guardada en el sistema"
+],
+"cuando": "Cuando un comprador consulta los productos del puesto",
+"entonces": [
+"El comprador visualiza el precio diario actualizado en soles",
+"El comprador visualiza la cantidad disponible actualizada",
+"Si el stock es cero, el comprador visualiza la oferta como agotada",
+"El comprador no puede agregar al carrito un producto cuya oferta está agotada"
+]
+}
+]
+}

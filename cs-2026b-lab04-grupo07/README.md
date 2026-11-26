@@ -95,9 +95,14 @@ Evaluación automatizada con **promptfoo** y validación mediante **JSON Schema*
 
 | Versión | Descripción | Aprobación global | `A1` Contrato JSON | `A2` Éxito y error | `A3` Sin impl. | `A4` No INVEST (`H7`) | `A5` Inyección (`H8`) | Fallos principales observados |
 |:---:|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---|
-| **`v1`** | Prompt ingenuo base (`v1.txt`) | **0/8 (0.0%)** | 0/8 (0%) | 0/8 (0%) | 6/8 (75%) | 0/1 (0%) | 1/1 (100%)* | Salida en texto libre fuera del JSON Schema (`H1`–`H8`); detalles de BD (`H5`, `H7`); 9 criterios inventados en `H7` no-INVEST. |
+| **`v1`** | Prompt ingenuo base (`v1.txt`) | **0/8 (0.0%)** | 0/8 (0%) | 0/8 (0%) | 6/8 (75%) | 0/1 (0%) | 1/1 (100%)\* | Salida en texto libre fuera del JSON Schema (`H1`–`H8`); detalles de BD (`H5`, `H7`); 9 criterios inventados en `H7` no-INVEST. |
+| **`v2`** | Rol + Contexto + Template JSON (`v2.txt`) | **7/8 (87.5%)** | 8/8 (100%) | 8/8 (100%) | 7/8 (87.5%) | 0/1 (0%) | 1/1 (100%) | `H7` marcó `invest_ok=false` pero inventó 11 escenarios de PostgreSQL; 87 escenarios totales (sobre-generación) y regla falsa contra decimales en `H5`. |
+| **`v3`** | 7 elementos + Cognitive Verifier + Few-shot + `<historia>` (`v3.txt`) | **7/8 (87.5%)** | 8/8 (100%) | 7/8 (87.5%) | 8/8 (100%) | 1/1 (100%) | 1/1 (100%) | Cumple `A1`, `A3`, `A4` y `A5` al 100% y reduce a 21 escenarios concisos. **Regresión explicada en `H6`:** el filtro INVEST sobre-estricto rechazó `H6` (`invest_ok=false`) al pedir los distritos exactos de cobertura. |
 
-\*Nota metodológica: la línea base `v1` se ejecutó en una sola interacción en lote en el asistente, lo que amortiguó accidentalmente el ataque de `H8` dentro del contexto compartido; desde `v2` cada caso se ejecuta en un Chat Temporal aislado.
+\*Notas de evaluación:
+1. La línea base `v1` se ejecutó en lote en una sola interacción del asistente, lo que amortiguó accidentalmente el ataque de `H8`; desde `v2` cada caso se ejecuta en un Chat Temporal aislado.
+2. **Calibración del evaluador (E3.4):** `A3_sin_implementacion` dio inicialmente un falso positivo en `v2/H5` (6/8 = 75%) porque `includes('react')` coincidió con el verbo `"reactivar"`. Se corrigió con límites de palabra (`\breact\b`) e inspección acotada a `escenarios`, además de migrar `$schema` a Draft-07 para `Ajv`.
+3. **Explicación de regresión `v2` → `v3` en `H6`:** `v3` superó la meta (≥85%) y eliminó la invención de escenarios técnicos en `H7` (`A4`: 0% → 100%), pero su regla INVEST resultó demasiado estricta frente a parámetros configurables como `"zona de cobertura de Arequipa"`. Hipótesis de ajuste futuro (`v3.1`): indicar explícitamente que los parámetros operativos configurables no invalidan INVEST.
 
 ---
 

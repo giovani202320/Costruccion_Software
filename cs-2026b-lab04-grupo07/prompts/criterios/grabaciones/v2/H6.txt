@@ -1,0 +1,156 @@
+{
+"historia_id": "H6",
+"invest_ok": true,
+"preguntas": [],
+"escenarios": [
+{
+"titulo": "Seleccionar recojo en puesto dentro del horario de atención",
+"tipo": "exito",
+"dado": [
+"Que el comprador tiene productos disponibles en su carrito",
+"Que se encuentra en el proceso de confirmación de su pedido",
+"Que el horario de atención del mercado es de 06:00 a 17:00"
+],
+"cuando": "El comprador selecciona la opción de recojo en puesto durante el horario de atención",
+"entonces": [
+"El sistema debe permitir seleccionar el recojo en el Mercado San Camilo",
+"El sistema debe mostrar los puestos donde se encuentran disponibles los productos del pedido",
+"El sistema debe registrar la modalidad de entrega como recojo en puesto",
+"El sistema debe permitir continuar con la confirmación del pedido"
+]
+},
+{
+"titulo": "Seleccionar delivery dentro de la zona de cobertura",
+"tipo": "exito",
+"dado": [
+"Que el comprador tiene productos disponibles en su carrito",
+"Que se encuentra en el proceso de confirmación de su pedido",
+"Que la dirección de entrega se encuentra dentro de la zona de cobertura de Arequipa"
+],
+"cuando": "El comprador selecciona la opción de delivery e ingresa una dirección válida dentro de la zona de cobertura",
+"entonces": [
+"El sistema debe permitir seleccionar la modalidad de delivery",
+"El sistema debe validar que la dirección ingresada se encuentre dentro de la zona de cobertura",
+"El sistema debe solicitar los datos necesarios para la entrega",
+"El sistema debe registrar la dirección y la modalidad de delivery en el pedido",
+"El sistema debe permitir continuar con la confirmación del pedido"
+]
+},
+{
+"titulo": "Impedir el recojo fuera del horario de atención",
+"tipo": "error",
+"dado": [
+"Que el comprador tiene productos disponibles en su carrito",
+"Que el horario de atención del mercado es de 06:00 a 17:00",
+"Que el comprador se encuentra fuera del horario de atención"
+],
+"cuando": "El comprador intenta seleccionar el recojo en puesto",
+"entonces": [
+"El sistema debe impedir programar el recojo fuera del horario de atención",
+"El sistema debe mostrar un mensaje indicando que el horario de recojo es de 06:00 a 17:00",
+"El sistema debe mantener disponible la opción de delivery si la dirección cumple con la cobertura"
+]
+},
+{
+"titulo": "Permitir el recojo exactamente al inicio del horario de atención",
+"tipo": "borde",
+"dado": [
+"Que el comprador tiene productos disponibles en su carrito",
+"Que la hora actual es exactamente las 06:00"
+],
+"cuando": "El comprador selecciona la opción de recojo en puesto",
+"entonces": [
+"El sistema debe permitir seleccionar el recojo",
+"El sistema debe registrar la modalidad de entrega correctamente"
+]
+},
+{
+"titulo": "Permitir el recojo exactamente al finalizar el horario de atención",
+"tipo": "borde",
+"dado": [
+"Que el comprador tiene productos disponibles en su carrito",
+"Que la hora actual es exactamente las 17:00"
+],
+"cuando": "El comprador selecciona la opción de recojo en puesto",
+"entonces": [
+"El sistema debe permitir seleccionar el recojo",
+"El sistema debe registrar la modalidad de entrega correctamente"
+]
+},
+{
+"titulo": "Impedir delivery fuera de la zona de cobertura",
+"tipo": "error",
+"dado": [
+"Que el comprador tiene productos disponibles en su carrito",
+"Que se encuentra en el proceso de confirmación de su pedido"
+],
+"cuando": "El comprador ingresa una dirección que se encuentra fuera de la zona de cobertura de Arequipa y selecciona delivery",
+"entonces": [
+"El sistema debe impedir seleccionar delivery para esa dirección",
+"El sistema debe mostrar un mensaje indicando que la dirección está fuera de la zona de cobertura",
+"El sistema debe permitir modificar la dirección o seleccionar recojo en puesto si se encuentra dentro del horario de atención"
+]
+},
+{
+"titulo": "Impedir delivery cuando la dirección está incompleta",
+"tipo": "error",
+"dado": [
+"Que el comprador ha seleccionado la modalidad de delivery",
+"Que los datos de su dirección de entrega están incompletos"
+],
+"cuando": "El comprador intenta confirmar el pedido",
+"entonces": [
+"El sistema debe impedir la confirmación del pedido",
+"El sistema debe identificar los campos obligatorios que faltan",
+"El sistema debe solicitar al comprador completar la dirección de entrega"
+]
+},
+{
+"titulo": "Cambiar de recojo a delivery antes de confirmar el pedido",
+"tipo": "exito",
+"dado": [
+"Que el comprador ha seleccionado inicialmente la modalidad de recojo en puesto",
+"Que todavía no ha confirmado el pedido",
+"Que la dirección de entrega se encuentra dentro de la zona de cobertura"
+],
+"cuando": "El comprador cambia la modalidad de entrega a delivery e ingresa una dirección válida",
+"entonces": [
+"El sistema debe actualizar la modalidad de entrega a delivery",
+"El sistema debe registrar la dirección de entrega proporcionada",
+"El sistema no debe conservar datos de recojo como modalidad seleccionada",
+"El sistema debe mostrar la modalidad actualizada antes de confirmar el pedido"
+]
+},
+{
+"titulo": "Cambiar de delivery a recojo antes de confirmar el pedido",
+"tipo": "exito",
+"dado": [
+"Que el comprador ha seleccionado inicialmente la modalidad de delivery",
+"Que todavía no ha confirmado el pedido",
+"Que la hora actual se encuentra entre las 06:00 y las 17:00"
+],
+"cuando": "El comprador cambia la modalidad de entrega a recojo en puesto",
+"entonces": [
+"El sistema debe actualizar la modalidad de entrega a recojo",
+"El sistema debe mostrar los puestos correspondientes al pedido",
+"El sistema no debe conservar la dirección de delivery como modalidad seleccionada",
+"El sistema debe mostrar la modalidad actualizada antes de confirmar el pedido"
+]
+},
+{
+"titulo": "Impedir la confirmación sin seleccionar una modalidad de entrega",
+"tipo": "error",
+"dado": [
+"Que el comprador tiene productos disponibles en su carrito",
+"Que se encuentra en el proceso de confirmación del pedido",
+"Que no ha seleccionado recojo en puesto ni delivery"
+],
+"cuando": "El comprador intenta confirmar el pedido",
+"entonces": [
+"El sistema debe impedir la confirmación del pedido",
+"El sistema debe mostrar un mensaje solicitando seleccionar una modalidad de entrega",
+"El sistema debe mantener los productos del carrito sin modificaciones"
+]
+}
+]
+}

@@ -1,0 +1,53 @@
+{
+ "historia_id": "H2",
+ "invest_ok": true,
+ "preguntas": [],
+ "escenarios": [
+ {
+ "titulo": "Agregar productos de distintos puestos al mismo carrito",
+ "tipo": "exito",
+ "dado": [
+ "un puesto de verduras ofrece 10 unidades de tomate disponibles a S/ 3.00 por unidad",
+ "un puesto de frutas ofrece 8 unidades de manzana disponibles a S/ 5.00 por unidad",
+ "el carrito del comprador está vacío"
+ ],
+ "cuando": "el comprador agrega 3 tomates y 2 manzanas al carrito",
+ "entonces": [
+ "ambos productos aparecen en un mismo carrito",
+ "los productos se muestran agrupados en sus respectivos puestos",
+ "el carrito presenta dos subórdenes, una por cada puesto",
+ "el importe total del carrito es S/ 19.00"
+ ]
+ },
+ {
+ "titulo": "Impedir agregar una cantidad superior al stock disponible",
+ "tipo": "error",
+ "dado": [
+ "un puesto ofrece 5 kilos de papa disponibles",
+ "el comprador tiene 2 kilos de papa agregados al carrito"
+ ],
+ "cuando": "el comprador intenta aumentar la cantidad a 7 kilos",
+ "entonces": [
+ "el sistema impide agregar una cantidad superior al stock disponible",
+ "el carrito no registra los 7 kilos solicitados",
+ "el comprador recibe un aviso indicando que solo quedan 5 kilos disponibles"
+ ]
+ },
+ {
+ "titulo": "Agregar productos respetando el stock individual de cada puesto",
+ "tipo": "borde",
+ "dado": [
+ "el puesto A ofrece 4 unidades de cebolla disponibles",
+ "el puesto B ofrece 6 unidades de zanahoria disponibles",
+ "el carrito contiene 3 unidades de cebolla del puesto A"
+ ],
+ "cuando": "el comprador agrega 2 unidades de zanahoria del puesto B",
+ "entonces": [
+ "el sistema permite agregar las 2 unidades de zanahoria",
+ "el carrito conserva las 3 unidades de cebolla del puesto A",
+ "los productos permanecen agrupados en dos subórdenes independientes",
+ "el stock disponible de cada oferta se respeta individualmente"
+ ]
+ }
+ ]
+}

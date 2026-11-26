@@ -1,0 +1,63 @@
+{
+"historia_id": "H3",
+"invest_ok": true,
+"preguntas": [],
+"escenarios": [
+{
+"titulo": "Registrar un único pago por el total del pedido",
+"tipo": "exito",
+"dado": [
+"un pedido confirmado que contiene productos de 3 puestos diferentes",
+"un monto total de S/ 85.50",
+"que todavía no han transcurrido los 15 minutos desde la reserva"
+],
+"cuando": "el comprador selecciona pago con Yape, ingresa el número de operación 123456 y adjunta una captura legible del comprobante correspondiente al pago de S/ 85.50",
+"entonces": [
+"el comprador puede registrar el pago por el monto total de S/ 85.50 en una sola operación",
+"visualiza una confirmación del registro del pago",
+"el pago queda asociado al pedido completo y no necesita registrar un pago separado para cada puesto"
+]
+},
+{
+"titulo": "Intentar registrar un número de operación con menos de 6 dígitos",
+"tipo": "error",
+"dado": [
+"un pedido confirmado por S/ 45.00",
+"que todavía se encuentra dentro del plazo de 15 minutos para registrar el pago"
+],
+"cuando": "el comprador ingresa el número de operación 12345 y adjunta la captura del comprobante",
+"entonces": [
+"el comprador no puede completar el registro del pago",
+"visualiza un mensaje indicando que el número de operación debe contener exactamente 6 dígitos"
+]
+},
+{
+"titulo": "Intentar registrar el pago después del plazo de reserva",
+"tipo": "borde",
+"dado": [
+"un pedido confirmado por S/ 60.00",
+"que ya superó los 15 minutos desde la reserva",
+"que el comprador dispone del número de operación 654321 y de la captura del comprobante"
+],
+"cuando": "el comprador intenta registrar el pago mediante Yape",
+"entonces": [
+"el comprador no puede registrar el pago fuera del plazo establecido",
+"visualiza un mensaje indicando que el plazo de 15 minutos para registrar el pago ha expirado"
+]
+},
+{
+"titulo": "Intentar registrar el pago sin adjuntar el comprobante",
+"tipo": "error",
+"dado": [
+"un pedido confirmado por S/ 32.00",
+"que todavía se encuentra dentro del plazo de 15 minutos para registrar el pago",
+"que el comprador ha ingresado el número de operación 789012"
+],
+"cuando": "el comprador intenta registrar el pago sin adjuntar la captura del comprobante de Yape",
+"entonces": [
+"el comprador no puede completar el registro del pago",
+"visualiza un mensaje indicando que debe adjuntar la captura del comprobante"
+]
+}
+]
+}

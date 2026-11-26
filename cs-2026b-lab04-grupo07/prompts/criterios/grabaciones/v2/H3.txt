@@ -1,0 +1,186 @@
+{
+ "historia_id": "H3",
+ "invest_ok": true,
+ "preguntas": [],
+ "escenarios": [
+ {
+ "titulo": "Registro exitoso del pago único mediante Yape",
+ "tipo": "exito",
+ "dado": [
+ "Que el cliente tiene un pedido confirmado",
+ "Y que el pedido tiene un monto total calculado que incluye productos de distintos comerciantes",
+ "Y que el plazo de reserva de 15 minutos sigue vigente",
+ "Y que el cliente dispone de un comprobante de Yape válido"
+ ],
+ "cuando": "El cliente ingresa el número de operación de 6 dígitos y adjunta la captura del comprobante correspondiente al monto total del pedido",
+ "entonces": [
+ "El sistema valida que el número de operación tenga exactamente 6 dígitos numéricos",
+ "Y verifica que se hayan completado todos los campos obligatorios",
+ "Y registra un único pago asociado al pedido completo",
+ "Y almacena el número de operación y la captura del comprobante",
+ "Y registra la fecha y hora de recepción del pago",
+ "Y muestra un mensaje de confirmación del registro del pago",
+ "Y notifica al cliente que su comprobante está pendiente de validación"
+ ]
+ },
+ {
+ "titulo": "Rechazar un número de operación con menos de 6 dígitos",
+ "tipo": "error",
+ "dado": [
+ "Que el cliente tiene un pedido confirmado",
+ "Y que el plazo de reserva sigue vigente"
+ ],
+ "cuando": "El cliente ingresa un número de operación de menos de 6 dígitos e intenta registrar el pago",
+ "entonces": [
+ "El sistema rechaza el registro del pago",
+ "Y muestra un mensaje indicando que el número de operación debe contener exactamente 6 dígitos",
+ "Y mantiene los datos ingresados para que el cliente pueda corregirlos"
+ ]
+ },
+ {
+ "titulo": "Rechazar un número de operación con más de 6 dígitos",
+ "tipo": "error",
+ "dado": [
+ "Que el cliente tiene un pedido confirmado",
+ "Y que el plazo de reserva sigue vigente"
+ ],
+ "cuando": "El cliente ingresa un número de operación de más de 6 dígitos e intenta registrar el pago",
+ "entonces": [
+ "El sistema rechaza el registro del pago",
+ "Y muestra un mensaje indicando que el número de operación debe contener exactamente 6 dígitos",
+ "Y no registra el pago"
+ ]
+ },
+ {
+ "titulo": "Rechazar caracteres no numéricos en el número de operación",
+ "tipo": "error",
+ "dado": [
+ "Que el cliente tiene un pedido confirmado",
+ "Y que el plazo de reserva sigue vigente"
+ ],
+ "cuando": "El cliente ingresa letras, espacios o caracteres especiales en el número de operación e intenta registrar el pago",
+ "entonces": [
+ "El sistema rechaza el número de operación",
+ "Y muestra un mensaje indicando que solo se permiten 6 dígitos numéricos",
+ "Y no registra el pago"
+ ]
+ },
+ {
+ "titulo": "Impedir el registro sin adjuntar el comprobante",
+ "tipo": "error",
+ "dado": [
+ "Que el cliente tiene un pedido confirmado",
+ "Y que el plazo de reserva sigue vigente",
+ "Y que el cliente ingresó un número de operación válido de 6 dígitos"
+ ],
+ "cuando": "El cliente intenta registrar el pago sin adjuntar la captura del comprobante de Yape",
+ "entonces": [
+ "El sistema impide registrar el pago",
+ "Y muestra un mensaje indicando que debe adjuntar la captura del comprobante",
+ "Y conserva el número de operación ingresado"
+ ]
+ },
+ {
+ "titulo": "Impedir el registro con número de operación vacío",
+ "tipo": "error",
+ "dado": [
+ "Que el cliente tiene un pedido confirmado",
+ "Y que el plazo de reserva sigue vigente",
+ "Y que el cliente adjuntó una captura del comprobante"
+ ],
+ "cuando": "El cliente intenta registrar el pago sin ingresar el número de operación",
+ "entonces": [
+ "El sistema impide registrar el pago",
+ "Y muestra un mensaje indicando que el número de operación es obligatorio"
+ ]
+ },
+ {
+ "titulo": "Impedir el registro de pago después de vencer los 15 minutos",
+ "tipo": "borde",
+ "dado": [
+ "Que el cliente tiene un pedido confirmado",
+ "Y que han transcurrido más de 15 minutos desde el inicio de la reserva",
+ "Y que el plazo de reserva ha vencido"
+ ],
+ "cuando": "El cliente intenta registrar el pago mediante Yape",
+ "entonces": [
+ "El sistema rechaza el registro del pago",
+ "Y muestra un mensaje indicando que el tiempo de reserva ha expirado",
+ "Y no permite asociar el comprobante al pedido vencido",
+ "Y comunica al cliente que debe realizar un nuevo pedido si desea continuar con la compra"
+ ]
+ },
+ {
+ "titulo": "Permitir el registro del pago en el último instante del plazo",
+ "tipo": "borde",
+ "dado": [
+ "Que el cliente tiene un pedido confirmado",
+ "Y que han transcurrido exactamente 15 minutos desde el inicio de la reserva"
+ ],
+ "cuando": "El cliente intenta registrar el pago",
+ "entonces": [
+ "El sistema aplica la regla de vencimiento de la reserva",
+ "Y permite el registro únicamente si la hora de recepción del pago se encuentra dentro del plazo establecido",
+ "Y rechaza el registro si el plazo ya ha vencido"
+ ]
+ },
+ {
+ "titulo": "Rechazar una captura de comprobante con formato no permitido",
+ "tipo": "error",
+ "dado": [
+ "Que el cliente tiene un pedido confirmado",
+ "Y que el plazo de reserva sigue vigente",
+ "Y que el cliente ingresó un número de operación válido"
+ ],
+ "cuando": "El cliente adjunta un archivo que no corresponde a un formato de imagen permitido",
+ "entonces": [
+ "El sistema rechaza el archivo adjunto",
+ "Y muestra un mensaje indicando los formatos de imagen permitidos",
+ "Y solicita adjuntar una captura válida",
+ "Y no registra el pago"
+ ]
+ },
+ {
+ "titulo": "Evitar registrar dos veces el mismo pago",
+ "tipo": "borde",
+ "dado": [
+ "Que el cliente ya registró correctamente un pago para su pedido",
+ "Y que el pedido tiene un comprobante asociado"
+ ],
+ "cuando": "El cliente vuelve a enviar el formulario de pago para el mismo pedido",
+ "entonces": [
+ "El sistema evita generar un segundo registro de pago para el mismo pedido",
+ "Y muestra un mensaje indicando que el pago ya fue registrado",
+ "Y conserva el comprobante y número de operación previamente registrados"
+ ]
+ },
+ {
+ "titulo": "Registrar un único pago para productos de distintos comerciantes",
+ "tipo": "exito",
+ "dado": [
+ "Que el cliente tiene un pedido confirmado con productos de dos o más puestos del Mercado San Camilo",
+ "Y que el sistema ha calculado el monto total del pedido"
+ ],
+ "cuando": "El cliente registra el pago del monto total mediante Yape con un número de operación válido y la captura del comprobante",
+ "entonces": [
+ "El sistema registra un único pago para el pedido completo",
+ "Y asocia el pago a todos los productos y puestos incluidos en el pedido",
+ "Y evita solicitar pagos individuales a cada comerciante",
+ "Y mantiene el detalle de los importes correspondientes a cada puesto"
+ ]
+ },
+ {
+ "titulo": "Rechazar el registro de un comprobante cuando el pedido no está confirmado",
+ "tipo": "error",
+ "dado": [
+ "Que el cliente tiene un pedido que no se encuentra en estado confirmado"
+ ],
+ "cuando": "El cliente intenta registrar un pago mediante Yape",
+ "entonces": [
+ "El sistema impide registrar el pago",
+ "Y muestra un mensaje indicando que solo se pueden pagar pedidos confirmados",
+ "Y no almacena el comprobante como pago del pedido"
+ ]
+ }
+ ]
+}

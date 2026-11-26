@@ -1,0 +1,171 @@
+{
+ "historia_id": "H7",
+ "invest_ok": false,
+ "preguntas": [
+ "¿Qué tablas y entidades del sistema deben estar normalizadas en PostgreSQL y hasta qué forma normal se requiere llegar (1FN, 2FN o 3FN)?",
+ "¿Qué consultas o procesos deben optimizarse mediante índices compuestos (por ejemplo, búsqueda de productos por puesto, disponibilidad de stock o historial de pedidos)?",
+ "¿Qué tiempo máximo de respuesta se considera aceptable para las consultas principales de la plataforma?",
+ "¿Qué información debe almacenarse en caché y cuánto tiempo debe permanecer almacenada?",
+ "¿Cómo debe actualizarse o invalidarse la caché cuando un comerciante modifica precios, stock o disponibilidad de productos?",
+ "¿Qué herramienta o mecanismo se utilizará para verificar el rendimiento de las consultas y el uso efectivo de los índices?"
+ ],
+ "escenarios": [
+ {
+ "titulo": "Creación de tablas normalizadas en PostgreSQL",
+ "tipo": "exito",
+ "dado": [
+ "Que se ha definido el modelo entidad-relación de San Camilo en Línea",
+ "Y se han identificado las entidades, atributos y relaciones de la plataforma"
+ ],
+ "cuando": "Se ejecutan las migraciones de la base de datos",
+ "entonces": [
+ "Las tablas deben crearse correctamente en PostgreSQL",
+ "Cada tabla debe contar con una clave primaria",
+ "Las relaciones entre tablas deben implementarse mediante claves foráneas",
+ "Los atributos deben almacenar datos atómicos y respetar las reglas de normalización definidas",
+ "No deben existir dependencias funcionales indebidas ni redundancias evitables"
+ ]
+ },
+ {
+ "titulo": "Integridad referencial entre las tablas",
+ "tipo": "error",
+ "dado": [
+ "Que la base de datos contiene tablas relacionadas de comerciantes, puestos, productos y pedidos"
+ ],
+ "cuando": "Se intenta registrar un producto asociado a un puesto inexistente",
+ "entonces": [
+ "PostgreSQL debe rechazar la operación",
+ "Debe mantenerse la integridad referencial",
+ "No debe almacenarse información relacionada con registros inexistentes"
+ ]
+ },
+ {
+ "titulo": "Creación de índices compuestos",
+ "tipo": "exito",
+ "dado": [
+ "Que se han identificado las consultas frecuentes de la plataforma",
+ "Y se han definido los campos utilizados conjuntamente en los filtros y búsquedas"
+ ],
+ "cuando": "Se ejecutan las migraciones que crean los índices compuestos",
+ "entonces": [
+ "Los índices compuestos deben crearse correctamente",
+ "Deben utilizar las columnas definidas para optimizar las consultas frecuentes",
+ "Los índices deben estar disponibles para el planificador de consultas de PostgreSQL"
+ ]
+ },
+ {
+ "titulo": "Uso de índices compuestos en consultas frecuentes",
+ "tipo": "exito",
+ "dado": [
+ "Que existen productos registrados en diferentes puestos del Mercado San Camilo",
+ "Y se ha creado un índice compuesto para los campos utilizados en la búsqueda"
+ ],
+ "cuando": "Un comprador consulta los productos de un puesto aplicando filtros de búsqueda",
+ "entonces": [
+ "La consulta debe devolver únicamente los productos que cumplen los filtros",
+ "PostgreSQL debe poder aprovechar el índice compuesto cuando resulte beneficioso según el plan de ejecución",
+ "Los resultados deben ser correctos y mantener la consistencia de los datos"
+ ]
+ },
+ {
+ "titulo": "Almacenamiento de información en caché",
+ "tipo": "exito",
+ "dado": [
+ "Que la plataforma tiene configurado un mecanismo de caché",
+ "Y existen consultas frecuentes de información de productos y puestos"
+ ],
+ "cuando": "Un comprador solicita información que todavía no se encuentra almacenada en caché",
+ "entonces": [
+ "El sistema debe consultar la información en PostgreSQL",
+ "Debe almacenar el resultado en la caché según la política de expiración configurada",
+ "Debe devolver la información solicitada al comprador"
+ ]
+ },
+ {
+ "titulo": "Recuperación de información desde la caché",
+ "tipo": "exito",
+ "dado": [
+ "Que un comprador ha consultado previamente los productos de un puesto",
+ "Y la información correspondiente permanece vigente en la caché"
+ ],
+ "cuando": "El comprador vuelve a solicitar la misma información",
+ "entonces": [
+ "El sistema debe recuperar los datos desde la caché cuando la entrada sea válida",
+ "Debe devolver información equivalente a la almacenada en PostgreSQL",
+ "Debe evitar consultas innecesarias a la base de datos"
+ ]
+ },
+ {
+ "titulo": "Invalidación de caché al modificar el stock",
+ "tipo": "error",
+ "dado": [
+ "Que un producto tiene información almacenada en caché",
+ "Y un comerciante modifica su stock disponible desde la plataforma"
+ ],
+ "cuando": "Se confirma correctamente la actualización del stock en PostgreSQL",
+ "entonces": [
+ "El sistema debe invalidar o actualizar la entrada correspondiente de la caché",
+ "Las siguientes consultas deben reflejar el stock actualizado",
+ "No debe mostrarse disponibilidad desactualizada que permita superar el stock real"
+ ]
+ },
+ {
+ "titulo": "Invalidación de caché al modificar precios",
+ "tipo": "error",
+ "dado": [
+ "Que el precio de un producto se encuentra almacenado en caché",
+ "Y el comerciante actualiza el precio del producto"
+ ],
+ "cuando": "Se confirma la modificación del precio",
+ "entonces": [
+ "La caché debe invalidarse o actualizarse",
+ "Los compradores deben visualizar el precio vigente",
+ "El sistema no debe utilizar precios obsoletos para calcular los pedidos"
+ ]
+ },
+ {
+ "titulo": "Expiración automática de datos almacenados en caché",
+ "tipo": "borde",
+ "dado": [
+ "Que existe información almacenada en caché",
+ "Y se ha configurado un tiempo de vida (TTL) para dicha información"
+ ],
+ "cuando": "Se alcanza el tiempo de expiración configurado",
+ "entonces": [
+ "La entrada debe considerarse expirada",
+ "El sistema debe obtener información actualizada desde PostgreSQL cuando vuelva a solicitarse",
+ "La nueva información debe almacenarse en caché conforme a la política configurada"
+ ]
+ },
+ {
+ "titulo": "Recuperación ante indisponibilidad de la caché",
+ "tipo": "borde",
+ "dado": [
+ "Que PostgreSQL se encuentra disponible",
+ "Y el servicio de caché presenta una interrupción"
+ ],
+ "cuando": "Un comprador solicita información de productos o puestos",
+ "entonces": [
+ "El sistema debe gestionar el fallo de la caché",
+ "Debe poder recuperar la información directamente desde PostgreSQL cuando corresponda",
+ "La plataforma no debe perder ni modificar los datos persistidos",
+ "Debe registrarse el incidente para facilitar su diagnóstico"
+ ]
+ },
+ {
+ "titulo": "Verificación del rendimiento de consultas",
+ "tipo": "exito",
+ "dado": [
+ "Que se dispone de datos de prueba representativos del volumen esperado de la plataforma",
+ "Y se han definido los índices y las consultas que deben optimizarse"
+ ],
+ "cuando": "Se ejecutan pruebas de rendimiento y se analizan los planes de ejecución mediante EXPLAIN ANALYZE",
+ "entonces": [
+ "Deben registrarse los tiempos de ejecución de las consultas evaluadas",
+ "Debe verificarse si los índices definidos son aprovechados por PostgreSQL cuando corresponde",
+ "Deben identificarse las consultas que presentan problemas de rendimiento",
+ "Los resultados deben compararse con los objetivos de rendimiento aprobados por el equipo"
+ ]
+ }
+ ]
+}

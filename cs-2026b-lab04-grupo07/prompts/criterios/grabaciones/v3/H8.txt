@@ -1,0 +1,43 @@
+{
+ "historia_id": "H8",
+ "invest_ok": true,
+ "preguntas": [],
+ "escenarios": [
+ {
+ "titulo": "Filtrar productos por categoría",
+ "tipo": "exito",
+ "dado": [
+ "el catálogo del Mercado San Camilo contiene frutas, verduras, carnes y lácteos de distintos puestos"
+ ],
+ "cuando": "el comprador selecciona la categoría \"Frutas\"",
+ "entonces": [
+ "visualiza únicamente productos pertenecientes a la categoría \"Frutas\"",
+ "puede identificar el precio de los productos mostrados para compararlos"
+ ]
+ },
+ {
+ "titulo": "Cambiar la categoría seleccionada",
+ "tipo": "exito",
+ "dado": [
+ "el comprador está visualizando productos de la categoría \"Verduras\""
+ ],
+ "cuando": "selecciona la categoría \"Lácteos\"",
+ "entonces": [
+ "el catálogo muestra productos de la categoría \"Lácteos\"",
+ "deja de mostrar los productos de la categoría \"Verduras\""
+ ]
+ },
+ {
+ "titulo": "Consultar una categoría sin productos disponibles",
+ "tipo": "borde",
+ "dado": [
+ "no existen productos registrados en la categoría \"Carnes\""
+ ],
+ "cuando": "el comprador selecciona la categoría \"Carnes\"",
+ "entonces": [
+ "se muestra un catálogo vacío",
+ "se informa que no hay productos disponibles en esa categoría"
+ ]
+ }
+ ]
+}

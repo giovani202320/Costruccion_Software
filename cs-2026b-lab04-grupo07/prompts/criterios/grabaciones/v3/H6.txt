@@ -1,0 +1,10 @@
+{
+"historia_id": "H6",
+"invest_ok": false,
+"preguntas": [
+"¿Cuál es la zona exacta de cobertura del servicio de delivery en Arequipa y cómo podrá saber el comprador si su dirección está dentro de ella?",
+"¿La elección entre recojo en puesto y delivery se aplica a todo el pedido, incluso cuando contiene productos de distintos puestos, o el comprador puede elegir una modalidad diferente para cada puesto?",
+"¿Qué debe ocurrir si el comprador selecciona recojo fuera del horario de atención (06:00 a 17:00)? ¿Debe impedirse la selección o permitir programar el recojo para otro horario?"
+],
+"escenarios": []
+}

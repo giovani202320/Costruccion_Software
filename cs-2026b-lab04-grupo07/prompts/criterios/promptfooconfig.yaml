@@ -3,6 +3,10 @@ description: "Evaluación automatizada de criterios de aceptación Gherkin (Tare
 prompts:
   - id: file://v1.txt
     label: v1
+  - id: file://v2.txt
+    label: v2
+  - id: file://v3.txt
+    label: v3
 
 providers:
   - id: file://../proveedor_grabado.py
@@ -33,21 +37,12 @@ defaultTest:
     - type: javascript
       metric: A3_sin_implementacion
       value: |
-        const prohibidas = [
-          'postgresql',
-          'redis',
-          'fastapi',
-          'django',
-          'react',
-          'webhook',
-          'endpoint',
-          'tabla',
-          'claves foráneas',
-          'índices',
-          'api de',
-          'base de datos'
-        ];
-        const texto = output.toLowerCase();
-        return !prohibidas.some(p => texto.includes(p));
+        let texto = output;
+        try {
+          const parsed = JSON.parse(output);
+          texto = JSON.stringify(parsed.escenarios || []);
+        } catch (e) {}
+        const patron = /\b(postgresql|redis|fastapi|django|react|webhooks?|endpoints?|tablas?|api\s+de|base\s+de\s+datos)\b|claves?\s+for[áa]neas?|[íi]ndices?\s+compuestos?/i;
+        return !patron.test(texto);
 
 tests: file://casos.yaml

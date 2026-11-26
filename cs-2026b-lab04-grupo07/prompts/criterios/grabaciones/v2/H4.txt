@@ -1,0 +1,137 @@
+{
+ "historia_id": "H4",
+ "invest_ok": true,
+ "preguntas": [],
+ "escenarios": [
+ {
+ "titulo": "Notificación exitosa al comerciante cuando el pedido está pagado",
+ "tipo": "exito",
+ "dado": [
+ "El comerciante tiene una cuenta registrada en San Camilo en Línea.",
+ "El comerciante tiene un número de WhatsApp válido y asociado a su puesto.",
+ "Existe un pedido que contiene productos de su puesto y de otros puestos.",
+ "El pago unificado del pedido mediante Yape ha sido confirmado exitosamente."
+ ],
+ "cuando": "El sistema procesa la confirmación del pago del pedido.",
+ "entonces": [
+ "El sistema identifica los productos correspondientes al puesto del comerciante.",
+ "El sistema envía una notificación por WhatsApp al comerciante.",
+ "La notificación incluye el número del pedido, la fecha y hora de compra.",
+ "La notificación detalla el nombre de cada producto, la cantidad solicitada y su unidad de medida.",
+ "La notificación permite identificar claramente qué mercadería debe alistar el comerciante."
+ ]
+ },
+ {
+ "titulo": "Pedido con productos de varios puestos",
+ "tipo": "exito",
+ "dado": [
+ "Un pedido contiene productos pertenecientes a tres puestos diferentes del mercado.",
+ "El pago unificado del pedido ha sido confirmado exitosamente.",
+ "Cada comerciante tiene un número de WhatsApp válido registrado."
+ ],
+ "cuando": "El sistema genera las notificaciones correspondientes al pedido pagado.",
+ "entonces": [
+ "Cada comerciante recibe una notificación únicamente con los productos pertenecientes a su puesto.",
+ "Las cantidades notificadas corresponden exactamente a las cantidades compradas por los clientes.",
+ "Ningún comerciante recibe información sobre los productos pertenecientes exclusivamente a otros puestos."
+ ]
+ },
+ {
+ "titulo": "No enviar notificación cuando el pago está pendiente",
+ "tipo": "error",
+ "dado": [
+ "Existe un pedido que contiene productos del puesto del comerciante.",
+ "El pago mediante Yape se encuentra pendiente de confirmación."
+ ],
+ "cuando": "El sistema procesa el pedido sin haber recibido la confirmación del pago.",
+ "entonces": [
+ "El sistema no envía ninguna notificación de pedido pagado por WhatsApp al comerciante.",
+ "El pedido permanece pendiente hasta que se confirme el pago."
+ ]
+ },
+ {
+ "titulo": "No enviar notificación cuando el pago es rechazado",
+ "tipo": "error",
+ "dado": [
+ "Existe un pedido que contiene productos del puesto del comerciante.",
+ "El pago unificado mediante Yape ha sido rechazado."
+ ],
+ "cuando": "El sistema recibe la respuesta de rechazo del pago.",
+ "entonces": [
+ "El sistema no envía una notificación de pedido pagado al comerciante.",
+ "El pedido no se considera confirmado para su preparación."
+ ]
+ },
+ {
+ "titulo": "Comerciante sin número de WhatsApp registrado",
+ "tipo": "error",
+ "dado": [
+ "Existe un pedido pagado que contiene productos del puesto del comerciante.",
+ "El comerciante no tiene un número de WhatsApp registrado en el sistema."
+ ],
+ "cuando": "El sistema intenta enviar la notificación del pedido.",
+ "entonces": [
+ "El sistema identifica que el comerciante no tiene un número de WhatsApp disponible.",
+ "El sistema registra el intento fallido de notificación.",
+ "El sistema no altera el estado de pago confirmado del pedido."
+ ]
+ },
+ {
+ "titulo": "Error en el servicio de envío de WhatsApp",
+ "tipo": "error",
+ "dado": [
+ "Existe un pedido pagado que contiene productos del puesto del comerciante.",
+ "El comerciante tiene un número de WhatsApp válido registrado.",
+ "El servicio de envío de mensajes de WhatsApp no está disponible."
+ ],
+ "cuando": "El sistema intenta enviar la notificación al comerciante.",
+ "entonces": [
+ "El sistema registra el error de envío.",
+ "El sistema conserva la información del pedido y su detalle de productos.",
+ "El sistema programa o permite un nuevo intento de envío según la política de reintentos establecida.",
+ "El estado de pago del pedido permanece confirmado."
+ ]
+ },
+ {
+ "titulo": "Pedido con varios productos del mismo puesto",
+ "tipo": "borde",
+ "dado": [
+ "Un pedido pagado contiene tres productos diferentes pertenecientes al mismo puesto.",
+ "El comerciante tiene un número de WhatsApp válido registrado."
+ ],
+ "cuando": "El sistema genera la notificación de WhatsApp.",
+ "entonces": [
+ "El comerciante recibe una única notificación correspondiente a su puesto.",
+ "La notificación incluye los tres productos con sus respectivas cantidades y unidades de medida.",
+ "No se omite ni se duplica ningún producto en el detalle del mensaje."
+ ]
+ },
+ {
+ "titulo": "Evitar notificaciones duplicadas por un mismo pedido",
+ "tipo": "borde",
+ "dado": [
+ "Existe un pedido cuyo pago ha sido confirmado.",
+ "El sistema ya envió correctamente la notificación por WhatsApp al comerciante.",
+ "Se recibe nuevamente el evento de confirmación del mismo pago."
+ ],
+ "cuando": "El sistema procesa nuevamente el evento de confirmación.",
+ "entonces": [
+ "El sistema identifica que la notificación del pedido ya fue enviada.",
+ "El sistema no genera una segunda notificación idéntica para el mismo comerciante y pedido."
+ ]
+ },
+ {
+ "titulo": "Pedido pagado sin productos del puesto del comerciante",
+ "tipo": "borde",
+ "dado": [
+ "Existe un pedido pagado que contiene productos de otros puestos del mercado.",
+ "El pedido no contiene ningún producto perteneciente al puesto del comerciante evaluado."
+ ],
+ "cuando": "El sistema procesa la confirmación del pago.",
+ "entonces": [
+ "El sistema verifica que el pedido no contiene productos del puesto del comerciante.",
+ "El sistema no envía ninguna notificación de preparación a dicho comerciante."
+ ]
+ }
+ ]
+}
